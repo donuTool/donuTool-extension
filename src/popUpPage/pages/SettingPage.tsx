@@ -25,8 +25,8 @@ export default function SettingPage() {
   return (
     <>
       <GoBackButton />
-      <div className="text-2xl font-bold mb-7 text-gray-600">설정</div>
-      <div className="flex justify-center items-center gap-5 mb-7">
+      <div className="text-2xl font-bold mb-7 text-neutral-600">설정</div>
+      <div className="flex justify-center items-center gap-5 mb-10">
         <img src={donuToolBar} className="w-[150px] h-[150px] brightness-[1.15]" />
         <div className="grid grid-cols-3 gap-2">
           {Array.from({ length: 9 }).map((_, i) => (
@@ -36,7 +36,7 @@ export default function SettingPage() {
           ))}
         </div>
       </div>
-      <input className="w-50 h-7 mb-2 bg-white text-center placeholder:text-center" placeholder="변경할 주소를 입력하세요" onKeyDown={setAddressOfNewTab} />
+      <input className="w-50 h-7 my-2 bg-white text-center placeholder:text-center" placeholder="변경할 주소를 입력하세요" onKeyDown={setAddressOfNewTab} />
       <div className="text-neutral-500">현재 주소 : {address}</div>
     </>
   );
