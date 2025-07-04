@@ -1,4 +1,18 @@
 export function createToolBarElement() {
+  let addressOfNewTab = "https://www.google.com";
+
+  chrome.storage.local.get("addressOfNewTab", (data) => {
+    if (data.addressOfNewTab) {
+      addressOfNewTab = data.addressOfNewTab;
+    }
+  });
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "local" && changes.addressOfNewTab) {
+      addressOfNewTab = changes.addressOfNewTab.newValue;
+    }
+  });
+
   const toolBarElement = document.createElement("div");
   toolBarElement.id = "donuTool-toolBar";
   toolBarElement.setAttribute("draggable", "false");
@@ -34,7 +48,10 @@ export function createToolBarElement() {
   toolBarElement.appendChild(toolBarButtonElement2);
 
   const toolBarButtonElement3 = createToolBarButton("donuTool-button3", "112px", "112px", "new", () => {
-    window.open("https://www.google.com", "_blank");
+    chrome.storage.local.get("addressOfNewTab", (data) => {
+      const target = data.addressOfNewTab || addressOfNewTab;
+      window.open(target, "_blank");
+    });
   });
   toolBarElement.appendChild(toolBarButtonElement3);
 
