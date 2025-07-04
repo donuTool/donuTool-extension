@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function SettingPage() {
   const [address, setAddress] = useState("");
 
-  chrome.storage.local.get("addressOfNewTab", (data) => {
+  chrome.storage?.local.get("addressOfNewTab", (data) => {
     if (data.addressOfNewTab) {
       setAddress(data.addressOfNewTab);
     }

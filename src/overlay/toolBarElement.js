@@ -83,9 +83,27 @@ function createToolBarButton(id, top, left, svgName, onClick) {
     justifyContent: "center",
     alignItems: "center",
     fontSize: "10px",
-    color: "gray",
     backgroundColor: "lightgray",
     cursor: "grabbing",
+    filter: "none",
+    transform: "scale(1)",
+    transition: "transform 1s ease, background-color 1s ease, filter 1s ease",
+  });
+
+  button.addEventListener("mouseenter", () => {
+    Object.assign(button.style, {
+      transform: "scale(1.1)",
+      backgroundColor: "darkgray",
+    });
+    svgImg.style.filter = "brightness(2)";
+  });
+
+  button.addEventListener("mouseleave", () => {
+    Object.assign(button.style, {
+      transform: "scale(1)",
+      backgroundColor: "lightgray",
+    });
+    svgImg.style.filter = "none";
   });
 
   const svgImg = document.createElement("img");
