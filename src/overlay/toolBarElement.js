@@ -101,19 +101,15 @@ function createToolBarButton(id, top, left, svgName, onClick) {
 
   button.appendChild(svgImg);
 
-  button.addEventListener("mouseenter", () => {
-    Object.assign(button.style, {
-      transform: "scale(1.1)",
-      backgroundColor: "darkgray",
-    });
+  button.addEventListener("mouseover", () => {
+    button.style.backgroundColor = "darkgray";
+    svgImg.style.transform = "scale(1.2)";
     svgImg.style.filter = "brightness(2)";
   });
 
-  button.addEventListener("mouseleave", () => {
-    Object.assign(button.style, {
-      transform: "scale(1)",
-      backgroundColor: "lightgray",
-    });
+  button.addEventListener("mouseout", () => {
+    button.style.backgroundColor = "lightgray";
+    svgImg.style.transform = "scale(1)";
     svgImg.style.filter = "none";
   });
 
