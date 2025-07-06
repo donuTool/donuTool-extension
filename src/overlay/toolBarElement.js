@@ -103,13 +103,13 @@ function createToolBarButton(id, top, left, svgName, onClick) {
 
   button.addEventListener("mouseover", () => {
     button.style.backgroundColor = "darkgray";
-    svgImg.style.transform = "scale(1.2)";
+    button.style.transform = (button.style.transform || "").replace(/scale\([^)]*\)/g, "").trim() + " scale(1.2)";
     svgImg.style.filter = "brightness(2)";
   });
 
   button.addEventListener("mouseout", () => {
     button.style.backgroundColor = "lightgray";
-    svgImg.style.transform = "scale(1)";
+    button.style.transform = (button.style.transform || "").replace(/scale\([^)]*\)/g, "").trim() + " scale(1)";
     svgImg.style.filter = "none";
   });
 
