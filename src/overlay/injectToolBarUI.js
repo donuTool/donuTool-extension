@@ -60,7 +60,7 @@
 
       buttonsInToolBar.forEach((button) => {
         button.style.transform = getReverseRotationAngle(e.clientX, e.clientY, window.innerWidth, window.innerHeight);
-        button.style.transition = "transform 0.3s ease";
+        button.style.transition = "transform 0.3s ease, background-color 0.3s ease";
       });
     }
 

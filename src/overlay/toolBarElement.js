@@ -85,10 +85,21 @@ function createToolBarButton(id, top, left, svgName, onClick) {
     fontSize: "10px",
     backgroundColor: "lightgray",
     cursor: "grabbing",
-    filter: "none",
     transform: "scale(1)",
-    transition: "transform 1s ease, background-color 1s ease, filter 1s ease",
+    pointerEvents: "auto",
   });
+
+  const svgImg = document.createElement("img");
+  svgImg.src = chrome.runtime.getURL(`assets/${svgName}.svg`);
+  Object.assign(svgImg.style, {
+    width: "25px",
+    height: "25px",
+    display: "block",
+    pointerEvents: "none",
+    transition: "filter 0.3s ease",
+  });
+
+  button.appendChild(svgImg);
 
   button.addEventListener("mouseenter", () => {
     Object.assign(button.style, {
@@ -105,17 +116,6 @@ function createToolBarButton(id, top, left, svgName, onClick) {
     });
     svgImg.style.filter = "none";
   });
-
-  const svgImg = document.createElement("img");
-  svgImg.src = chrome.runtime.getURL(`assets/${svgName}.svg`);
-  Object.assign(svgImg.style, {
-    width: "25px",
-    height: "25px",
-    display: "block",
-    pointerEvents: "none",
-  });
-
-  button.appendChild(svgImg);
 
   return button;
 }
