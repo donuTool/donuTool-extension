@@ -1,6 +1,9 @@
+import { useState } from "react";
+import { DndContext } from "@dnd-kit/core";
 import GoBackButton from "@/popUpPage/components/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
-import { useState } from "react";
+import { Droppable } from "@/popUpPage/utils/Droppable";
+import { Draggable } from "@/popUpPage/utils/Draggable";
 
 export default function SettingPage() {
   const [address, setAddress] = useState("");
@@ -26,16 +29,29 @@ export default function SettingPage() {
     <>
       <GoBackButton />
       <div className="text-2xl font-bold mb-7 text-neutral-600">설정</div>
-      <div className="flex justify-center items-center gap-5 mb-10">
-        <VirtualToolBar />
-        <div className="grid grid-cols-3 gap-2">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="flex items-center justify-center bg-neutral-300 shadow w-[35px] h-[35px] rounded-full text-xs font-light text-neutral-600 cursor-pointer">
-              {i + 1}
-            </div>
-          ))}
+      <DndContext
+        onDragEnd={({ active, over }) => {
+          if (over?.id === "toolBarUI") {
+            alert(`${active.id} moved to toolbar!`);
+          }
+        }}>
+        <div className="flex justify-center items-center gap-5 mb-10">
+          <Droppable id="toolBarUI">
+            <VirtualToolBar />
+          </Droppable>
+          <div className="grid grid-cols-3 gap-2">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <>
+                <Draggable id={`toolBarButton${i}`}>
+                  <div key={i} className="flex items-center justify-center bg-neutral-300 shadow w-[35px] h-[35px] rounded-full text-xs font-light text-neutral-600 cursor-pointer">
+                    {i + 1}
+                  </div>
+                </Draggable>
+              </>
+            ))}
+          </div>
         </div>
-      </div>
+      </DndContext>
       <input className="w-50 h-7 my-2 bg-white text-center placeholder:text-center rounded-lg" placeholder="변경할 주소를 입력하세요" onKeyDown={setAddressOfNewTab} />
       <div className="text-neutral-500">현재 주소 : {address}</div>
     </>
