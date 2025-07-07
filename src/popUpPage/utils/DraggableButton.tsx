@@ -8,6 +8,8 @@ export default function DraggableButton({ button }: { button: Button }) {
 
   const style = {
     transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
+    top: button.status === "IN_TOOLBAR" ? `${button.top}px` : undefined,
+    left: button.status === "IN_TOOLBAR" ? `${button.left}px` : undefined,
   };
 
   return (
@@ -16,7 +18,7 @@ export default function DraggableButton({ button }: { button: Button }) {
       {...listeners}
       {...attributes}
       style={style}
-      className="w-[35px] h-[35px] bg-neutral-300 text-xs font-light text-neutral-600 rounded-full flex items-center justify-center cursor-pointer">
+      className="w-[33.3px] h-[33.3px] bg-neutral-300 text-xs font-light text-neutral-600 rounded-full flex items-center justify-center cursor-pointer shadow">
       {button.title}
     </div>
   );

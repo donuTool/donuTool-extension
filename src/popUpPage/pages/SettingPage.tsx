@@ -48,14 +48,24 @@ export default function SettingPage() {
 
     if (!over) return;
 
-    const buttonId = active.id as string;
-
+    const activeId = String(active.id);
     const overId = String(over.id);
-    const newStatus = overId.includes("toolbar") ? "IN_TOOLBAR" : overId.includes("list") ? "IN_LIST" : undefined;
 
-    if (!newStatus) return;
+    setButtons((prev) => {
+      const activeIndex = prev.findIndex((btn) => btn.id === activeId);
+      const overIndex = prev.findIndex((btn) => btn.id === overId);
 
-    setButtons((prev) => prev.map((button) => (button.id === buttonId ? { ...button, status: newStatus } : button)));
+      if (activeIndex < 0 || overIndex < 0) return prev;
+
+      const newButtons = [...prev];
+      const temp = { id: newButtons[activeIndex].id, title: newButtons[activeIndex].title };
+      newButtons[activeIndex].id = newButtons[overIndex].id;
+      newButtons[activeIndex].title = newButtons[overIndex].title;
+      newButtons[overIndex].id = temp.id;
+      newButtons[overIndex].title = temp.title;
+
+      return newButtons;
+    });
   };
 
   return (

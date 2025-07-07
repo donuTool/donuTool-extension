@@ -1,6 +1,10 @@
 import { useDroppable } from "@dnd-kit/core";
 
-export default function DroppableArea({ id, children }: { id: string; children: React.ReactNode }) {
+export default function DroppableArea({ id, children, style }: { id: string; children: React.ReactNode; style?: React.CSSProperties }) {
   const { setNodeRef } = useDroppable({ id });
-  return <div ref={setNodeRef}>{children}</div>;
+  return (
+    <div ref={setNodeRef} style={style}>
+      {children}
+    </div>
+  );
 }
