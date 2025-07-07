@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { DndContext, DragEndEvent, useDraggable, useDroppable } from "@dnd-kit/core";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Button } from "@/store/types";
 import GoBackButton from "@/popUpPage/components/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
+import ButtonsInList from "@/popUpPage/components/ButtonsInList";
 
 const INITIAL_BUTTONS: Button[] = [
   { id: "1", title: "1", status: "IN_LIST" },
@@ -20,36 +21,6 @@ const INITIAL_BUTTONS: Button[] = [
   { id: "d", title: "d", status: "IN_TOOLBAR", top: 109.2, left: 53.3 },
   { id: "e", title: "e", status: "IN_TOOLBAR", top: 92.5, left: 15.8 },
 ];
-
-function DroppableArea({ id, children }: { id: string; children: React.ReactNode }) {
-  const { setNodeRef } = useDroppable({ id });
-  return (
-    <div ref={setNodeRef} className="w-[35px] h-[35px] bg-neutral-200 rounded-full flex items-center justify-center shadow">
-      {children}
-    </div>
-  );
-}
-
-function DraggableButton({ button }: { button: Button }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: button.id,
-  });
-
-  const style = {
-    transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      style={style}
-      className="w-[35px] h-[35px] bg-neutral-300 text-xs font-light text-neutral-600 rounded-full flex items-center justify-center cursor-pointer">
-      {button.title}
-    </div>
-  );
-}
 
 export default function SettingPage() {
   const [address, setAddress] = useState("");
@@ -94,15 +65,7 @@ export default function SettingPage() {
       <DndContext onDragEnd={handleDragEnd}>
         <div className="flex justify-center items-center gap-5 mb-10">
           <VirtualToolBar buttons={buttons} />
-          <div className="grid grid-cols-3 gap-2">
-            {buttons
-              .filter((b) => b.status === "IN_LIST")
-              .map((button) => (
-                <DroppableArea key={button.id} id={`slot-${button.id}`}>
-                  <DraggableButton button={button} />
-                </DroppableArea>
-              ))}
-          </div>
+          <ButtonsInList buttons={buttons} />
         </div>
       </DndContext>
       <input className="w-50 h-7 my-2 bg-white text-center placeholder:text-center rounded-lg" placeholder="변경할 주소를 입력하세요" onKeyDown={setAddressOfNewTab} />
