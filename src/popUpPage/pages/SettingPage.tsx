@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Button } from "@/store/types";
 import GoBackButton from "@/popUpPage/components/GoBackButton";
@@ -25,6 +25,18 @@ const INITIAL_BUTTONS: Button[] = [
 export default function SettingPage() {
   const [address, setAddress] = useState("");
   const [buttons, setButtons] = useState<Button[]>(INITIAL_BUTTONS);
+
+  useEffect(() => {
+    chrome.storage?.local.get("buttonsSetting", (data) => {
+      if (data.buttonsSetting) {
+        setButtons(data.buttonsSetting);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    chrome.storage?.local.set({ buttonsSetting: buttons });
+  }, [buttons]);
 
   chrome.storage?.local.get("addressOfNewTab", (data) => {
     if (data.addressOfNewTab) {
