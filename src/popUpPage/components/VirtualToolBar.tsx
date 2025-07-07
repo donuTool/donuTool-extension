@@ -1,6 +1,7 @@
 import donuToolBar from "@/assets/donuToolBar.png";
 import { Button } from "@/store/types";
 import { useDraggable } from "@dnd-kit/core";
+import DroppableArea from "@/popUpPage/utils/DroppableArea";
 
 function DraggableButton({ button }: { button: Button }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -22,13 +23,15 @@ function DraggableButton({ button }: { button: Button }) {
 
 export default function VirtualToolBar({ buttons }: { buttons: Button[] }) {
   return (
-    <div className="relative">
-      <img src={donuToolBar} className="w-[150px] h-[150px] brightness-[1.15]" />
-      {buttons
-        .filter((button) => button.status === "IN_TOOLBAR")
-        .map((button) => (
-          <DraggableButton key={button.id} button={button} />
-        ))}
-    </div>
+    <DroppableArea id="toolbar">
+      <div className="relative">
+        <img src={donuToolBar} className="w-[150px] h-[150px] brightness-[1.15]" />
+        {buttons
+          .filter((button) => button.status === "IN_TOOLBAR")
+          .map((button) => (
+            <DraggableButton key={button.id} button={button} />
+          ))}
+      </div>
+    </DroppableArea>
   );
 }

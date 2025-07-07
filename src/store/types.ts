@@ -7,8 +7,3 @@ export type Button = {
   top?: number;
   left?: number;
 };
-
-export type Area = {
-  id: ButtonStatus;
-  title: string;
-};
