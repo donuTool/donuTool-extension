@@ -1,0 +1,14 @@
+export type ButtonStatus = "IN_TOOLBAR" | "IN_LIST";
+
+export type Button = {
+  id: string;
+  title: string;
+  status: ButtonStatus;
+  top?: number;
+  left?: number;
+};
+
+export type Area = {
+  id: ButtonStatus;
+  title: string;
+};
