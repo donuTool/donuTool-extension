@@ -6,20 +6,20 @@ import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
 
 const INITIAL_BUTTONS: Button[] = [
-  { id: "1", image: "1", status: "IN_LIST" },
-  { id: "2", image: "2", status: "IN_LIST" },
-  { id: "3", image: "3", status: "IN_LIST" },
-  { id: "4", image: "4", status: "IN_LIST" },
-  { id: "5", image: "5", status: "IN_LIST" },
-  { id: "6", image: "6", status: "IN_LIST" },
-  { id: "7", image: "7", status: "IN_LIST" },
-  { id: "8", image: "8", status: "IN_LIST" },
-  { id: "9", image: "9", status: "IN_LIST" },
-  { id: "a", image: "arrow-left", status: "IN_TOOLBAR", top: 15, left: 93.3 },
-  { id: "b", image: "arrow-right", status: "IN_TOOLBAR", top: 53.3, left: 109.2 },
-  { id: "c", image: "new", status: "IN_TOOLBAR", top: 93.3, left: 93.3 },
-  { id: "d", image: "arrow-right-to-line", status: "IN_TOOLBAR", top: 109.2, left: 53.3 },
-  { id: "e", image: "arrow-left-to-line", status: "IN_TOOLBAR", top: 92.5, left: 15.8 },
+  { id: "reload", image: "rotate", status: "IN_LIST" },
+  { id: "close", image: "close", status: "IN_LIST" },
+  { id: "translate", image: "languages", status: "IN_LIST" },
+  { id: "downloadImages", image: "image-down", status: "IN_LIST" },
+  { id: "bookmark", image: "star", status: "IN_LIST" },
+  { id: "bookmark2", image: "bookmark", status: "IN_LIST" },
+  { id: "copyTabAddress", image: "clipboard-copy", status: "IN_LIST" },
+  { id: "print", image: "printer", status: "IN_LIST" },
+  { id: "developer", image: "code", status: "IN_LIST" },
+  { id: "goBack", image: "arrow-left", status: "IN_TOOLBAR", top: 15, left: 93.3 },
+  { id: "goForward", image: "arrow-right", status: "IN_TOOLBAR", top: 53.3, left: 109.2 },
+  { id: "newTab", image: "new", status: "IN_TOOLBAR", top: 93.3, left: 93.3 },
+  { id: "moveToNextTab", image: "arrow-right-to-line", status: "IN_TOOLBAR", top: 109.2, left: 53.3 },
+  { id: "moveToPrevTab", image: "arrow-left-to-line", status: "IN_TOOLBAR", top: 92.5, left: 15.8 },
 ];
 
 export default function SettingPage() {
