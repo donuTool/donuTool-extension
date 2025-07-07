@@ -6,20 +6,20 @@ import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
 
 const INITIAL_BUTTONS: Button[] = [
-  { id: "1", title: "1", status: "IN_LIST" },
-  { id: "2", title: "2", status: "IN_LIST" },
-  { id: "3", title: "3", status: "IN_LIST" },
-  { id: "4", title: "4", status: "IN_LIST" },
-  { id: "5", title: "5", status: "IN_LIST" },
-  { id: "6", title: "6", status: "IN_LIST" },
-  { id: "7", title: "7", status: "IN_LIST" },
-  { id: "8", title: "8", status: "IN_LIST" },
-  { id: "9", title: "9", status: "IN_LIST" },
-  { id: "a", title: "a", status: "IN_TOOLBAR", top: 15, left: 93.3 },
-  { id: "b", title: "b", status: "IN_TOOLBAR", top: 53.3, left: 109.2 },
-  { id: "c", title: "c", status: "IN_TOOLBAR", top: 93.3, left: 93.3 },
-  { id: "d", title: "d", status: "IN_TOOLBAR", top: 109.2, left: 53.3 },
-  { id: "e", title: "e", status: "IN_TOOLBAR", top: 92.5, left: 15.8 },
+  { id: "1", image: "1", status: "IN_LIST" },
+  { id: "2", image: "2", status: "IN_LIST" },
+  { id: "3", image: "3", status: "IN_LIST" },
+  { id: "4", image: "4", status: "IN_LIST" },
+  { id: "5", image: "5", status: "IN_LIST" },
+  { id: "6", image: "6", status: "IN_LIST" },
+  { id: "7", image: "7", status: "IN_LIST" },
+  { id: "8", image: "8", status: "IN_LIST" },
+  { id: "9", image: "9", status: "IN_LIST" },
+  { id: "a", image: "arrow-left", status: "IN_TOOLBAR", top: 15, left: 93.3 },
+  { id: "b", image: "arrow-right", status: "IN_TOOLBAR", top: 53.3, left: 109.2 },
+  { id: "c", image: "new", status: "IN_TOOLBAR", top: 93.3, left: 93.3 },
+  { id: "d", image: "arrow-right-to-line", status: "IN_TOOLBAR", top: 109.2, left: 53.3 },
+  { id: "e", image: "arrow-left-to-line", status: "IN_TOOLBAR", top: 92.5, left: 15.8 },
 ];
 
 export default function SettingPage() {
@@ -70,11 +70,11 @@ export default function SettingPage() {
       if (activeIndex < 0 || overIndex < 0) return prev;
 
       const newButtons = [...prev];
-      const temp = { id: newButtons[activeIndex].id, title: newButtons[activeIndex].title };
+      const temp = { id: newButtons[activeIndex].id, image: newButtons[activeIndex].image };
       newButtons[activeIndex].id = newButtons[overIndex].id;
-      newButtons[activeIndex].title = newButtons[overIndex].title;
+      newButtons[activeIndex].image = newButtons[overIndex].image;
       newButtons[overIndex].id = temp.id;
-      newButtons[overIndex].title = temp.title;
+      newButtons[overIndex].image = temp.image;
 
       return newButtons;
     });
