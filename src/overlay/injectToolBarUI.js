@@ -3,6 +3,12 @@
   const { createToolBarElement } = await import(chrome.runtime.getURL("overlay/toolBarElement.js"));
   const { handleMessageFromPopUp } = await import(chrome.runtime.getURL("overlay/messageHandler.js"));
 
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "local" && changes.buttonsSetting) {
+      toolBarUI = createToolBarElement();
+    }
+  });
+
   handleMessageFromPopUp();
 
   let isElementInteractive = false;
@@ -10,7 +16,7 @@
   let lastCursorPosition = { x: 0, y: 0 };
   let lastScrollYPosition = window.scrollY;
 
-  const toolBarUI = createToolBarElement();
+  let toolBarUI = await createToolBarElement();
   document.body.appendChild(toolBarUI);
 
   const buttonsInToolBar = [];
