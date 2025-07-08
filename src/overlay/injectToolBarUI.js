@@ -3,13 +3,13 @@
   const { createToolBarElement } = await import(chrome.runtime.getURL("overlay/toolBarElement.js"));
   const { handleMessageFromPopUp } = await import(chrome.runtime.getURL("overlay/messageHandler.js"));
 
-  const bookmarkMessage = document.createElement("div");
-  Object.assign(bookmarkMessage.style, {
+  const alertBox = document.createElement("div");
+  Object.assign(alertBox.style, {
     position: "absolute",
     top: "-4vh",
     left: "50%",
     display: "flex",
-    width: "19vw",
+    width: "21vw",
     height: "4vh",
     justifyContent: "center",
     alignItems: "center",
@@ -22,7 +22,7 @@
     transition: "transform 0.5s ease",
     zIndex: 10000,
   });
-  document.body.appendChild(bookmarkMessage);
+  document.body.appendChild(alertBox);
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === "local" && changes.buttonsSetting) {
@@ -33,14 +33,18 @@
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === "showBookmarkAlert") {
       const trimmedTitle = message.title.length > 15 ? message.title.slice(0, 15) + "..." : message.title;
-
-      bookmarkMessage.innerText = `${trimmedTitle} 북마크 완료`;
-      bookmarkMessage.style.transform = "translateX(-50%) translateY(4vh)";
-
-      setTimeout(() => {
-        bookmarkMessage.style.transform = "translateX(-50%) translateY(-4vh)";
-      }, 2000);
+      alertBox.innerText = `${trimmedTitle} 페이지 북마크 완료`;
     }
+    if (message.action === "showClipboardCopyAlert") {
+      const trimmedTitle = message.title.length > 15 ? message.title.slice(0, 15) + "..." : message.title;
+      alertBox.innerText = `${trimmedTitle} 페이지 주소 복사 완료`;
+    }
+
+    alertBox.style.transform = "translateX(-50%) translateY(4vh)";
+
+    setTimeout(() => {
+      alertBox.style.transform = "translateX(-50%) translateY(-4vh)";
+    }, 2000);
   });
 
   handleMessageFromPopUp();

@@ -22,6 +22,6 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "permissions": ["storage", "scripting", "activeTab", "tabs", "bookmarks"],
+  "permissions": ["storage", "scripting", "activeTab", "tabs", "bookmarks", "clipboardWrite"],
   "host_permissions": ["<all_urls>"]
 }

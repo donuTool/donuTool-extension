@@ -50,5 +50,26 @@ chrome.runtime.onMessage.addListener((message) => {
     });
   }
 
+  if (message.action === "copyCurrentTabAddress") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const url = tabs[0]?.url;
+      const tab = tabs[0];
+      if (url) {
+        chrome.scripting.executeScript({
+          target: { tabId: tabs[0].id },
+          func: (url) => {
+            navigator.clipboard.writeText(url);
+          },
+          args: [url],
+        });
+
+        chrome.tabs.sendMessage(tab.id, {
+          action: "showClipboardCopyAlert",
+          title: tab.title,
+        });
+      }
+    });
+  }
+
   return true;
 });

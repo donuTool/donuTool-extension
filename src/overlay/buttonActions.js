@@ -31,7 +31,9 @@ export const buttonActions = {
   "bookmark2": () => {
     chrome.runtime.sendMessage({ action: "bookmarkCurrentTab" });
   },
-  "copyTabAddress": () => alert("copyTabAddress"),
+  "copyTabAddress": () => {
+    chrome.runtime.sendMessage({ action: "copyCurrentTabAddress" });
+  },
   "print": () => alert("print"),
   "developer": () => alert("developer"),
 };
