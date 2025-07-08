@@ -3,6 +3,27 @@
   const { createToolBarElement } = await import(chrome.runtime.getURL("overlay/toolBarElement.js"));
   const { handleMessageFromPopUp } = await import(chrome.runtime.getURL("overlay/messageHandler.js"));
 
+  const bookmarkMessage = document.createElement("div");
+  Object.assign(bookmarkMessage.style, {
+    position: "absolute",
+    top: "-4vh",
+    left: "50%",
+    display: "flex",
+    width: "19vw",
+    height: "4vh",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "14px",
+    fontWeight: "500",
+    color: "#808080",
+    backgroundColor: "#EDEFEF",
+    borderRadius: "0 0 0.9rem 0.9rem",
+    transform: "translateX(-50%)",
+    transition: "transform 0.5s ease",
+    zIndex: 10000,
+  });
+  document.body.appendChild(bookmarkMessage);
+
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === "local" && changes.buttonsSetting) {
       toolBarUI = createToolBarElement();
@@ -11,7 +32,14 @@
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === "showBookmarkAlert") {
-      alert(`${message.title} 북마크 추가됨`);
+      const trimmedTitle = message.title.length > 15 ? message.title.slice(0, 15) + "..." : message.title;
+
+      bookmarkMessage.innerText = `${trimmedTitle} 북마크 완료`;
+      bookmarkMessage.style.transform = "translateX(-50%) translateY(4vh)";
+
+      setTimeout(() => {
+        bookmarkMessage.style.transform = "translateX(-50%) translateY(-4vh)";
+      }, 2000);
     }
   });
 
