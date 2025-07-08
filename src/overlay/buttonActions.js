@@ -17,8 +17,12 @@ export const buttonActions = {
   "moveToPrevTab": () => {
     chrome.runtime.sendMessage({ action: "goToPreviousTab" });
   },
-  "reload": () => alert("reload"),
-  "close": () => alert("close"),
+  "reload": () => {
+    location.reload();
+  },
+  "close": () => {
+    chrome.runtime.sendMessage({ action: "closeCurrentTab" });
+  },
   "translate": () => alert("translate"),
   "downloadImages": () => alert("downloadImages"),
   "bookmark": () => alert("bookmark"),
