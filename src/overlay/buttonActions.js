@@ -23,8 +23,6 @@ export const buttonActions = {
   "close": () => {
     chrome.runtime.sendMessage({ action: "closeCurrentTab" });
   },
-  "translate": () => alert("translate"),
-  "downloadImages": () => alert("downloadImages"),
   "bookmark": () => {
     chrome.runtime.sendMessage({ action: "bookmarkCurrentTab" });
   },
@@ -34,6 +32,10 @@ export const buttonActions = {
   "copyTabAddress": () => {
     chrome.runtime.sendMessage({ action: "copyCurrentTabAddress" });
   },
-  "print": () => alert("print"),
+  "print": () => {
+    chrome.runtime.sendMessage({ action: "printCurrentPage" });
+  },
+  "translate": () => alert("translate"),
+  "downloadImages": () => alert("downloadImages"),
   "developer": () => alert("developer"),
 };

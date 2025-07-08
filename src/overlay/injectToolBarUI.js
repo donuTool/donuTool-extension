@@ -13,7 +13,7 @@
     height: "4vh",
     justifyContent: "center",
     alignItems: "center",
-    fontSize: "14px",
+    fontSize: "1vw",
     fontWeight: "500",
     color: "#808080",
     backgroundColor: "#EDEFEF",

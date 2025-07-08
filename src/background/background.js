@@ -90,5 +90,16 @@ chrome.runtime.onMessage.addListener((message) => {
     });
   }
 
+  if (message.action === "printCurrentPage") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: () => {
+          window.print();
+        },
+      });
+    });
+  }
+
   return true;
 });
