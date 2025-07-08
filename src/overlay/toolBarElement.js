@@ -26,7 +26,7 @@ export async function createToolBarElement() {
   const buttonsSetting = await new Promise((resolve) => {
     chrome.storage.local.get("buttonsSetting", (data) => {
       const allSettings = data.buttonsSetting || [];
-      resolve(allSettings.slice(9, 14));
+      resolve(allSettings.slice(0, 5));
     });
   });
 
