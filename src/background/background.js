@@ -153,5 +153,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
 
+  if (message.action === "captureVisibleTab") {
+    chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tabId = tabs[0].id;
+
+        chrome.tabs.sendMessage(tabId, {
+          action: "downloadCapturedImage",
+          dataUrl,
+          title: tabs[0].title,
+        });
+      });
+    });
+  }
+
   return true;
 });

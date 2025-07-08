@@ -41,5 +41,7 @@ export const buttonActions = {
   "downloadImages": () => {
     chrome.runtime.sendMessage({ action: "downloadImagesFromCurrentPage" });
   },
-  "developer": () => alert("developer"),
+  "capture": () => {
+    chrome.runtime.sendMessage({ action: "captureVisibleTab" });
+  },
 };

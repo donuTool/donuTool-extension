@@ -45,6 +45,17 @@
     if (message.action === "imagesDownloadSuccess") {
       alertBox.innerText = "이미지 다운로드 성공";
     }
+    if (message.action === "downloadCapturedImage") {
+      const trimmedTitle = message.title.length > 15 ? message.title.slice(0, 15) + "..." : message.title;
+      alertBox.innerText = "페이지 캡쳐 성공";
+
+      const link = document.createElement("a");
+      link.href = message.dataUrl;
+      link.download = `[${trimmedTitle}].png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
 
     alertBox.style.transform = "translateX(-50%) translateY(4vh)";
 
