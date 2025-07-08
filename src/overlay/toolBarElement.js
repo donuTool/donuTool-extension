@@ -1,6 +1,4 @@
 export async function createToolBarElement() {
-  let addressOfNewTab = "https://www.google.com";
-
   const toolBarElement = document.createElement("div");
   toolBarElement.id = "donuTool-toolBar";
   toolBarElement.setAttribute("draggable", "false");
@@ -32,38 +30,28 @@ export async function createToolBarElement() {
     });
   });
 
-  const toolBarButtonElement1 = createToolBarButton("donuTool-button1", "18px", "112px", buttonsSetting[0].image, () => {
-    window.history.go(-1);
-  });
+  const toolBarButtonElement1 = await createToolBarButton("donuTool-button1", "18px", "112px", buttonsSetting[0].image, buttonsSetting[0].id);
   toolBarElement.appendChild(toolBarButtonElement1);
 
-  const toolBarButtonElement2 = createToolBarButton("donuTool-button2", "64px", "131px", buttonsSetting[1].image, () => {
-    window.history.go(1);
-  });
+  const toolBarButtonElement2 = await createToolBarButton("donuTool-button2", "64px", "131px", buttonsSetting[1].image, buttonsSetting[1].id);
   toolBarElement.appendChild(toolBarButtonElement2);
 
-  const toolBarButtonElement3 = createToolBarButton("donuTool-button3", "112px", "112px", buttonsSetting[2].image, () => {
-    chrome.storage.local.get("addressOfNewTab", (data) => {
-      const target = data.addressOfNewTab || addressOfNewTab;
-      window.open(target, "_blank");
-    });
-  });
+  const toolBarButtonElement3 = await createToolBarButton("donuTool-button3", "112px", "112px", buttonsSetting[2].image, buttonsSetting[2].id);
   toolBarElement.appendChild(toolBarButtonElement3);
 
-  const toolBarButtonElement4 = createToolBarButton("donuTool-button4", "131px", "64px", buttonsSetting[3].image, () => {
-    chrome.runtime.sendMessage({ action: "goToNextTab" });
-  });
+  const toolBarButtonElement4 = await createToolBarButton("donuTool-button4", "131px", "64px", buttonsSetting[3].image, buttonsSetting[3].id);
   toolBarElement.appendChild(toolBarButtonElement4);
 
-  const toolBarButtonElement5 = createToolBarButton("donuTool-button5", "111px", "19px", buttonsSetting[4].image, () => {
-    chrome.runtime.sendMessage({ action: "goToPreviousTab" });
-  });
+  const toolBarButtonElement5 = await createToolBarButton("donuTool-button5", "111px", "19px", buttonsSetting[4].image, buttonsSetting[4].id);
   toolBarElement.appendChild(toolBarButtonElement5);
 
   return toolBarElement;
 }
 
-function createToolBarButton(id, top, left, svgName, onClick) {
+async function createToolBarButton(id, top, left, svgName, actionKey) {
+  const { buttonActions } = await import(chrome.runtime.getURL("overlay/buttonActions.js"));
+  const onClick = buttonActions[actionKey];
+
   const button = document.createElement("div");
   button.id = id;
   button.addEventListener("mouseup", onClick);

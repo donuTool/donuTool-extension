@@ -18,7 +18,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["assets/donuToolBar.png", "assets/*.svg", "overlay/toolBarUtils.js", "overlay/toolBarElement.js", "overlay/messageHandler.js"],
+      "resources": ["assets/donuToolBar.png", "assets/*.svg", "overlay/*.js"],
       "matches": ["<all_urls>"]
     }
   ],
