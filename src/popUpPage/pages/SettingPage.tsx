@@ -47,6 +47,24 @@ export default function SettingPage() {
   const setAddressOfNewTab = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       let addressValue = event.currentTarget.value;
+      const inputElement = event.currentTarget;
+
+      const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(addressValue);
+      const hasPeriod = /\./.test(addressValue);
+      const hasBlankSpace = /\s/.test(addressValue);
+
+      if (hasKorean || !hasPeriod || hasBlankSpace) {
+        inputElement.classList.add("border", "border-red-400", "animate-shake");
+
+        setTimeout(() => {
+          inputElement.classList.remove("animate-shake");
+        }, 400);
+        setTimeout(() => {
+          inputElement.classList.remove("border", "border-red-400");
+        }, 1000);
+        return;
+      }
+
       if (!/^https?:\/\//.test(addressValue)) {
         addressValue = "https://" + addressValue;
       }
@@ -90,7 +108,11 @@ export default function SettingPage() {
           <ButtonsInList buttons={buttons} />
         </div>
       </DndContext>
-      <input className="w-50 h-7 my-2 bg-white text-center placeholder:text-center rounded-lg" placeholder="변경할 주소를 입력하세요" onKeyDown={setAddressOfNewTab} />
+      <input
+        className="w-50 h-7 my-2 bg-white text-center placeholder:text-center rounded-lg focus:outline-none transition-all"
+        placeholder="변경할 주소를 입력하세요"
+        onKeyDown={setAddressOfNewTab}
+      />
       <div className="text-neutral-500">현재 주소 : {address}</div>
     </>
   );
