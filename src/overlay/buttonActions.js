@@ -25,8 +25,12 @@ export const buttonActions = {
   },
   "translate": () => alert("translate"),
   "downloadImages": () => alert("downloadImages"),
-  "bookmark": () => alert("bookmark"),
-  "bookmark2": () => alert("bookmark2"),
+  "bookmark": () => {
+    chrome.runtime.sendMessage({ action: "bookmarkCurrentTab" });
+  },
+  "bookmark2": () => {
+    chrome.runtime.sendMessage({ action: "bookmarkCurrentTab" });
+  },
   "copyTabAddress": () => alert("copyTabAddress"),
   "print": () => alert("print"),
   "developer": () => alert("developer"),

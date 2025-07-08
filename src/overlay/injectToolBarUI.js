@@ -9,6 +9,12 @@
     }
   });
 
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.action === "showBookmarkAlert") {
+      alert(`${message.title} 북마크 추가됨`);
+    }
+  });
+
   handleMessageFromPopUp();
 
   let isElementInteractive = false;

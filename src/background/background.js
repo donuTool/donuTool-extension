@@ -35,5 +35,20 @@ chrome.runtime.onMessage.addListener((message) => {
     });
   }
 
+  if (message.action === "bookmarkCurrentTab") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0];
+      chrome.bookmarks.create({
+        title: tab.title,
+        url: tab.url,
+      });
+
+      chrome.tabs.sendMessage(tab.id, {
+        action: "showBookmarkAlert",
+        title: tab.title,
+      });
+    });
+  }
+
   return true;
 });
