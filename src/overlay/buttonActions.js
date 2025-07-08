@@ -35,7 +35,11 @@ export const buttonActions = {
   "print": () => {
     chrome.runtime.sendMessage({ action: "printCurrentPage" });
   },
-  "translate": () => alert("translate"),
-  "downloadImages": () => alert("downloadImages"),
+  "translate": () => {
+    chrome.runtime.sendMessage({ action: "openTranslatedPage" });
+  },
+  "downloadImages": () => {
+    chrome.runtime.sendMessage({ action: "downloadImagesFromCurrentPage" });
+  },
   "developer": () => alert("developer"),
 };

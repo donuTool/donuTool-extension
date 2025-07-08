@@ -11,7 +11,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "goToNextTab" || message.action === "goToPreviousTab") {
     chrome.tabs.query({ currentWindow: true }, (tabs) => {
       chrome.tabs.query({ active: true, currentWindow: true }, (activeTabs) => {
@@ -98,6 +98,58 @@ chrome.runtime.onMessage.addListener((message) => {
           window.print();
         },
       });
+    });
+  }
+
+  if (message.action === "openTranslatedPage") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const originalUrl = tabs[0].url;
+      const translatedUrl = `https://translate.google.com/translate?sl=auto&tl=ko&u=${encodeURIComponent(originalUrl)}`;
+      chrome.tabs.create({ url: translatedUrl });
+    });
+  }
+
+  if (message.action === "downloadImagesFromCurrentPage") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0];
+      const tabId = tab.id;
+      const noSpaceTitle = tab.title.replace(/\s+/g, "");
+      const trimmedTitle = noSpaceTitle.length > 15 ? `${noSpaceTitle.slice(0, 15)}...` : noSpaceTitle;
+      const safeTitle = trimmedTitle.replace(/[^\p{L}\p{N}_\-()\[\]]/gu, "_");
+
+      chrome.scripting.executeScript(
+        {
+          target: { tabId },
+          func: () => {
+            const imageUrls = Array.from(document.querySelectorAll("img"))
+              .map((img) => img.src)
+              .filter((src) => src && !src.startsWith("data:"));
+            return imageUrls;
+          },
+        },
+        (injectionResults) => {
+          const urls = injectionResults[0].result;
+
+          if (!urls || urls.length === 0) {
+            chrome.tabs.sendMessage(tab.id, {
+              action: "noImagesAvailable",
+            });
+            return;
+          }
+
+          urls.forEach((url, index) => {
+            chrome.downloads.download({
+              url,
+              filename: `${safeTitle}/image-${index + 1}.jpg`,
+              saveAs: false,
+            });
+          });
+
+          chrome.tabs.sendMessage(tab.id, {
+            action: "imagesDownloadSuccess",
+          });
+        }
+      );
     });
   }
 

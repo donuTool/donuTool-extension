@@ -39,6 +39,12 @@
       const trimmedTitle = message.title.length > 15 ? message.title.slice(0, 15) + "..." : message.title;
       alertBox.innerText = `${trimmedTitle} 페이지 주소 복사 완료`;
     }
+    if (message.action === "noImagesAvailable") {
+      alertBox.innerText = "다운로드할 이미지가 없음";
+    }
+    if (message.action === "imagesDownloadSuccess") {
+      alertBox.innerText = "이미지 다운로드 성공";
+    }
 
     alertBox.style.transform = "translateX(-50%) translateY(4vh)";
 
