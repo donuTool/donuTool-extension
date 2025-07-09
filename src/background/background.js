@@ -1,3 +1,5 @@
+let isCapturing = false;
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url && (tab.url.startsWith("http://") || tab.url.startsWith("https://"))) {
     chrome.storage.local.get("donuToolActive", (data) => {
@@ -91,13 +93,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.action === "printCurrentPage") {
+    if (isCapturing) return;
+    isCapturing = true;
+
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        func: () => {
-          window.print();
+      const tabId = tabs[0].id;
+
+      chrome.scripting.executeScript(
+        {
+          target: { tabId },
+          func: () => {
+            const toolbar = document.getElementById("donuTool-toolBar");
+            if (toolbar) toolbar.style.opacity = "0";
+
+            const restoreOpacity = () => {
+              const toolbar = document.getElementById("donuTool-toolBar");
+              if (toolbar) toolbar.style.opacity = "";
+              window.removeEventListener("afterprint", restoreOpacity);
+            };
+
+            window.addEventListener("afterprint", restoreOpacity);
+            window.print();
+          },
         },
-      });
+        () => {
+          isCapturing = false;
+        }
+      );
     });
   }
 
@@ -154,16 +176,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.action === "captureVisibleTab") {
-    chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        const tabId = tabs[0].id;
+    if (isCapturing) return;
+    isCapturing = true;
 
-        chrome.tabs.sendMessage(tabId, {
-          action: "downloadCapturedImage",
-          dataUrl,
-          title: tabs[0].title,
-        });
-      });
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tabId = tabs[0].id;
+
+      chrome.scripting.executeScript(
+        {
+          target: { tabId },
+          func: () => {
+            const toolbar = document.getElementById("donuTool-toolBar");
+            if (toolbar) toolbar.style.opacity = "0";
+          },
+        },
+        () => {
+          setTimeout(() => {
+            chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
+              chrome.scripting.executeScript({
+                target: { tabId },
+                func: () => {
+                  const toolbar = document.getElementById("donuTool-toolBar");
+                  if (toolbar) toolbar.style.opacity = "";
+                },
+              });
+
+              chrome.tabs.sendMessage(tabId, {
+                action: "downloadCapturedImage",
+                dataUrl,
+                title: tabs[0].title,
+              });
+
+              isCapturing = false;
+            });
+          }, 100);
+        }
+      );
     });
   }
 
