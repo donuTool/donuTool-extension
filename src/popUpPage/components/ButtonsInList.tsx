@@ -1,4 +1,4 @@
-import { Button } from "@/store/types";
+import { Button } from "@/stores/types";
 import DroppableArea from "@/popUpPage/utils/DroppableArea";
 import DraggableButton from "@/popUpPage/utils/DraggableButton";
 

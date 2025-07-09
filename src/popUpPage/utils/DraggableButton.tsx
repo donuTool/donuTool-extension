@@ -1,5 +1,5 @@
 import { useDraggable } from "@dnd-kit/core";
-import { Button } from "@/store/types";
+import { Button } from "@/stores/types";
 
 export default function DraggableButton({ button }: { button: Button }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({

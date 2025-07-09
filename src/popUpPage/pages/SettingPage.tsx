@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { Button } from "@/store/types";
+import { Button } from "@/stores/types";
 import GoBackButton from "@/popUpPage/components/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
