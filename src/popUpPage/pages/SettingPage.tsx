@@ -23,7 +23,7 @@ const INITIAL_BUTTONS: Button[] = [
 ];
 
 export default function SettingPage() {
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState("https://google.com");
   const [buttons, setButtons] = useState<Button[]>(INITIAL_BUTTONS);
 
   useEffect(() => {
@@ -54,13 +54,15 @@ export default function SettingPage() {
       const hasBlankSpace = /\s/.test(addressValue);
 
       if (hasKorean || !hasPeriod || hasBlankSpace) {
-        inputElement.classList.add("border", "border-red-400", "animate-shake");
+        inputElement.classList.remove("bg-neutral-100");
+        inputElement.classList.add("bg-red-100", "animate-shake");
 
         setTimeout(() => {
           inputElement.classList.remove("animate-shake");
         }, 400);
         setTimeout(() => {
-          inputElement.classList.remove("border", "border-red-400");
+          inputElement.classList.remove("bg-red-100");
+          inputElement.classList.add("bg-neutral-100");
         }, 1000);
         return;
       }
@@ -109,7 +111,7 @@ export default function SettingPage() {
         </div>
       </DndContext>
       <input
-        className="w-50 h-7 my-2 bg-white text-center placeholder:text-center rounded-lg focus:outline-none transition-all"
+        className="w-45 h-7 my-2 bg-neutral-100 text-center placeholder:text-center rounded-lg focus:outline-none transition-all"
         placeholder="변경할 주소를 입력하세요"
         onKeyDown={setAddressOfNewTab}
       />
