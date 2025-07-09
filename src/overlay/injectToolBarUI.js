@@ -1,7 +1,6 @@
 (async () => {
   const { updateToolBarUIPosition, checkCursorEvent, getRotationAngle, getReverseRotationAngle } = await import(chrome.runtime.getURL("overlay/toolBarUtils.js"));
   const { createToolBarElement } = await import(chrome.runtime.getURL("overlay/toolBarElement.js"));
-  const { handleMessageFromPopUp } = await import(chrome.runtime.getURL("overlay/messageHandler.js"));
 
   const alertBox = document.createElement("div");
   Object.assign(alertBox.style, {
@@ -56,6 +55,18 @@
       link.click();
       document.body.removeChild(link);
     }
+    if (message.action === "requestFullscreen") {
+      alertBox.innerText = "전체화면";
+      document.documentElement.requestFullscreen();
+    }
+    if (message.action === "addToolbar") {
+      alertBox.innerText = "툴바 활성화됨";
+    }
+    if (message.action === "removeToolbar") {
+      alertBox.innerText = "툴바 비활성화됨";
+      const element = document.getElementById("donuTool-toolBar");
+      if (element) element.remove();
+    }
 
     alertBox.style.transform = "translateX(-50%) translateY(4vh)";
 
@@ -63,8 +74,6 @@
       alertBox.style.transform = "translateX(-50%) translateY(-4vh)";
     }, 2000);
   });
-
-  handleMessageFromPopUp();
 
   let isElementInteractive = false;
   let isMouseDown = false;
@@ -140,4 +149,29 @@
     },
     true
   );
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "/" && e.shiftKey && e.metaKey) {
+      chrome.storage.local.get(
+        ("donuToolActive",
+        (data) => {
+          if (data.donuToolActive) {
+            alertBox.innerText = "툴바 일시 비활성화됨";
+            toolBarUI.style.display = "none";
+            chrome.storage.local.set({ donuToolActive: false });
+          } else {
+            alertBox.innerText = "툴바 활성화됨";
+            toolBarUI.style.display = "flex";
+            chrome.storage.local.set({ donuToolActive: true });
+          }
+        })
+      );
+
+      alertBox.style.transform = "translateX(-50%) translateY(4vh)";
+
+      setTimeout(() => {
+        alertBox.style.transform = "translateX(-50%) translateY(-4vh)";
+      }, 2000);
+    }
+  });
 })();

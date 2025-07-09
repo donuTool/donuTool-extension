@@ -8,6 +8,7 @@ export default function StartButton() {
             target: { tabId: tab.id! },
             files: ["overlay/injectToolBarUI.js"],
           });
+          chrome.tabs.sendMessage(tab.id!, { action: "addToolbar" });
         });
         chrome.storage.local.set({ donuToolActive: true });
       }
