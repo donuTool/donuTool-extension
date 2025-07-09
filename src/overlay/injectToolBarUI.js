@@ -1,6 +1,7 @@
 (async () => {
   const { updateToolBarUIPosition, checkCursorEvent, getRotationAngle, getReverseRotationAngle } = await import(chrome.runtime.getURL("overlay/toolBarUtils.js"));
   const { createToolBarElement } = await import(chrome.runtime.getURL("overlay/toolBarElement.js"));
+  const { handleMessageAction } = await import(chrome.runtime.getURL("overlay/handleMessageAction.js"));
 
   const alertBox = document.createElement("div");
   Object.assign(alertBox.style, {
@@ -30,49 +31,15 @@
   });
 
   chrome.runtime.onMessage.addListener((message) => {
-    if (message.action === "showBookmarkAlert") {
-      const trimmedTitle = message.title.length > 15 ? message.title.slice(0, 15) + "..." : message.title;
-      alertBox.innerText = `${trimmedTitle} 페이지 북마크 완료`;
-    }
-    if (message.action === "showClipboardCopyAlert") {
-      const trimmedTitle = message.title.length > 15 ? message.title.slice(0, 15) + "..." : message.title;
-      alertBox.innerText = `${trimmedTitle} 페이지 주소 복사 완료`;
-    }
-    if (message.action === "noImagesAvailable") {
-      alertBox.innerText = "다운로드할 이미지가 없음";
-    }
-    if (message.action === "imagesDownloadSuccess") {
-      alertBox.innerText = "이미지 다운로드 성공";
-    }
-    if (message.action === "downloadCapturedImage") {
-      const trimmedTitle = message.title.length > 15 ? message.title.slice(0, 15) + "..." : message.title;
-      alertBox.innerText = "페이지 캡쳐 성공";
+    const result = handleMessageAction[message.action]?.(message);
 
-      const link = document.createElement("a");
-      link.href = message.dataUrl;
-      link.download = `[${trimmedTitle}].png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    if (result) {
+      alertBox.innerText = result;
+      alertBox.style.transform = "translateX(-50%) translateY(4vh)";
+      setTimeout(() => {
+        alertBox.style.transform = "translateX(-50%) translateY(-4vh)";
+      }, 2000);
     }
-    if (message.action === "requestFullscreen") {
-      alertBox.innerText = "전체화면";
-      document.documentElement.requestFullscreen();
-    }
-    if (message.action === "addToolbar") {
-      alertBox.innerText = "툴바 활성화됨";
-    }
-    if (message.action === "removeToolbar") {
-      alertBox.innerText = "툴바 비활성화됨";
-      const element = document.getElementById("donuTool-toolBar");
-      if (element) element.remove();
-    }
-
-    alertBox.style.transform = "translateX(-50%) translateY(4vh)";
-
-    setTimeout(() => {
-      alertBox.style.transform = "translateX(-50%) translateY(-4vh)";
-    }, 2000);
   });
 
   let isElementInteractive = false;
