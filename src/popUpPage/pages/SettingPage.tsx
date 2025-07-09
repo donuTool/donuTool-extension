@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Button } from "@/stores/types";
+import { useThemeStore } from "@/stores/useThemeStore";
 import GoBackButton from "@/popUpPage/components/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
@@ -50,6 +51,8 @@ export default function SettingPage() {
   const [address, setAddress] = useState("https://google.com");
   const [buttons, setButtons] = useState<Button[]>(INITIAL_BUTTONS);
 
+  const isDarkMode = useThemeStore((state) => state.isDarkMode);
+
   useEffect(() => {
     chrome.storage?.local.get("buttonsSetting", (data) => {
       if (data.buttonsSetting) {
@@ -78,15 +81,25 @@ export default function SettingPage() {
       const hasBlankSpace = /\s/.test(addressValue);
 
       if (hasKorean || !hasPeriod || hasBlankSpace) {
-        inputElement.classList.remove("bg-neutral-100");
-        inputElement.classList.add("bg-red-100", "animate-shake");
+        if (isDarkMode) {
+          inputElement.classList.remove("dark:bg-donutool-button");
+          inputElement.classList.add("bg-red-400", "animate-shake");
+        } else {
+          inputElement.classList.remove("bg-neutral-100");
+          inputElement.classList.add("bg-red-100", "animate-shake");
+        }
 
         setTimeout(() => {
           inputElement.classList.remove("animate-shake");
         }, 400);
         setTimeout(() => {
-          inputElement.classList.remove("bg-red-100");
-          inputElement.classList.add("bg-neutral-100");
+          if (isDarkMode) {
+            inputElement.classList.remove("bg-red-400");
+            inputElement.classList.add("dark:bg-donutool-button");
+          } else {
+            inputElement.classList.remove("bg-red-100");
+            inputElement.classList.add("bg-neutral-100");
+          }
         }, 1000);
         return;
       }
@@ -130,7 +143,9 @@ export default function SettingPage() {
   return (
     <>
       <GoBackButton />
-      <div className="mb-7 text-2xl font-bold text-neutral-600">설정</div>
+      <div className="dark:text-donutool-text mb-7 text-2xl font-bold text-neutral-600 select-none">
+        설정
+      </div>
       <DndContext onDragEnd={handleDragEnd}>
         <div className="mb-10 flex items-center justify-center gap-5">
           <VirtualToolBar buttons={buttons} />
@@ -138,11 +153,21 @@ export default function SettingPage() {
         </div>
       </DndContext>
       <input
-        className="my-2 h-7 w-45 rounded-lg bg-neutral-100 text-center transition-all placeholder:text-center focus:outline-none"
+        className="dark:bg-donutool-button dark:text-donutool-text my-2 h-7 w-45 rounded-lg bg-neutral-100 text-center transition-all placeholder:text-center focus:outline-none"
         placeholder="변경할 주소를 입력하세요"
         onKeyDown={setAddressOfNewTab}
       />
-      <div className="text-neutral-500">현재 주소 : {address}</div>
+      <div className="dark:text-donutool-text text-neutral-500 select-none">
+        현재 주소 :{" "}
+        <a
+          href={address}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block max-w-[120px] truncate align-bottom underline"
+        >
+          {address}
+        </a>
+      </div>
     </>
   );
 }
