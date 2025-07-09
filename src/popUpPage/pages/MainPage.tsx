@@ -5,7 +5,9 @@ import GoToOptionButton from "@/popUpPage/components/GoToOptionButton";
 
 export default function MainPage() {
   function Title() {
-    return <h2 className="text-3xl mb-4 font-black text-neutral-600">DonuTool</h2>;
+    return (
+      <h2 className="mb-4 text-3xl font-black text-neutral-600">DonuTool</h2>
+    );
   }
 
   return (

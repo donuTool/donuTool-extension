@@ -6,11 +6,35 @@ import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
 
 const INITIAL_BUTTONS: Button[] = [
-  { id: "goBack", image: "arrow-left", status: "IN_TOOLBAR", top: 15, left: 93.3 },
-  { id: "goForward", image: "arrow-right", status: "IN_TOOLBAR", top: 53.3, left: 109.2 },
+  {
+    id: "goBack",
+    image: "arrow-left",
+    status: "IN_TOOLBAR",
+    top: 15,
+    left: 93.3,
+  },
+  {
+    id: "goForward",
+    image: "arrow-right",
+    status: "IN_TOOLBAR",
+    top: 53.3,
+    left: 109.2,
+  },
   { id: "newTab", image: "new", status: "IN_TOOLBAR", top: 93.3, left: 93.3 },
-  { id: "moveToNextTab", image: "arrow-right-to-line", status: "IN_TOOLBAR", top: 109.2, left: 53.3 },
-  { id: "moveToPrevTab", image: "arrow-left-to-line", status: "IN_TOOLBAR", top: 92.5, left: 15.8 },
+  {
+    id: "moveToNextTab",
+    image: "arrow-right-to-line",
+    status: "IN_TOOLBAR",
+    top: 109.2,
+    left: 53.3,
+  },
+  {
+    id: "moveToPrevTab",
+    image: "arrow-left-to-line",
+    status: "IN_TOOLBAR",
+    top: 92.5,
+    left: 15.8,
+  },
   { id: "reload", image: "rotate", status: "IN_LIST" },
   { id: "close", image: "close", status: "IN_LIST" },
   { id: "translate", image: "languages", status: "IN_LIST" },
@@ -90,7 +114,10 @@ export default function SettingPage() {
       if (activeIndex < 0 || overIndex < 0) return prev;
 
       const newButtons = [...prev];
-      const temp = { id: newButtons[activeIndex].id, image: newButtons[activeIndex].image };
+      const temp = {
+        id: newButtons[activeIndex].id,
+        image: newButtons[activeIndex].image,
+      };
       newButtons[activeIndex].id = newButtons[overIndex].id;
       newButtons[activeIndex].image = newButtons[overIndex].image;
       newButtons[overIndex].id = temp.id;
@@ -103,15 +130,15 @@ export default function SettingPage() {
   return (
     <>
       <GoBackButton />
-      <div className="text-2xl font-bold mb-7 text-neutral-600">설정</div>
+      <div className="mb-7 text-2xl font-bold text-neutral-600">설정</div>
       <DndContext onDragEnd={handleDragEnd}>
-        <div className="flex justify-center items-center gap-5 mb-10">
+        <div className="mb-10 flex items-center justify-center gap-5">
           <VirtualToolBar buttons={buttons} />
           <ButtonsInList buttons={buttons} />
         </div>
       </DndContext>
       <input
-        className="w-45 h-7 my-2 bg-neutral-100 text-center placeholder:text-center rounded-lg focus:outline-none transition-all"
+        className="my-2 h-7 w-45 rounded-lg bg-neutral-100 text-center transition-all placeholder:text-center focus:outline-none"
         placeholder="변경할 주소를 입력하세요"
         onKeyDown={setAddressOfNewTab}
       />

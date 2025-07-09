@@ -6,7 +6,11 @@ import DraggableButton from "@/popUpPage/utils/DraggableButton";
 export default function VirtualToolBar({ buttons }: { buttons: Button[] }) {
   return (
     <div className="relative">
-      <img src={donuToolBar} draggable={false} className="w-[150px] h-[150px] brightness-[1.15]" />
+      <img
+        src={donuToolBar}
+        draggable={false}
+        className="h-[150px] w-[150px] brightness-[1.15]"
+      />
       {buttons
         .filter((button) => button.status === "IN_TOOLBAR")
         .map((button) => (
@@ -19,7 +23,8 @@ export default function VirtualToolBar({ buttons }: { buttons: Button[] }) {
               left: `${button.left}px`,
               width: "33.3px",
               height: "33.3px",
-            }}>
+            }}
+          >
             <DraggableButton button={button} />
           </DroppableArea>
         ))}

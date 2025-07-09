@@ -19,7 +19,8 @@ export default function StartButton() {
   return (
     <button
       onClick={addToolBarUI}
-      className="font-semibold absolute top-3 text-xs left-3 px-3.5 py-2 flex cursor-pointer items-center justify-center rounded-full text-neutral-600 bg-gray-100 p-1 shadow transition duration-300 hover:shadow-md">
+      className="absolute top-3 left-3 flex cursor-pointer items-center justify-center rounded-full bg-gray-100 p-1 px-3.5 py-2 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
+    >
       시작
     </button>
   );

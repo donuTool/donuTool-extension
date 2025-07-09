@@ -7,7 +7,9 @@ export default function DraggableButton({ button }: { button: Button }) {
   });
 
   const style = {
-    transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
+    transform: transform
+      ? `translate(${transform.x}px, ${transform.y}px)`
+      : undefined,
     top: button.status === "IN_TOOLBAR" ? `${button.top}px` : undefined,
     left: button.status === "IN_TOOLBAR" ? `${button.left}px` : undefined,
   };
@@ -18,8 +20,12 @@ export default function DraggableButton({ button }: { button: Button }) {
       {...listeners}
       {...attributes}
       style={style}
-      className="w-[33.3px] h-[33.3px] bg-neutral-300 text-xs font-light text-neutral-600 rounded-full flex items-center justify-center cursor-pointer shadow">
-      <img src={chrome.runtime?.getURL(`assets/${button.image}.svg`)} className="block w-[20.8px] h-[20.8px]" />
+      className="flex h-[33.3px] w-[33.3px] cursor-pointer items-center justify-center rounded-full bg-neutral-300 text-xs font-light text-neutral-600 shadow"
+    >
+      <img
+        src={chrome.runtime?.getURL(`assets/${button.image}.svg`)}
+        className="block h-[20.8px] w-[20.8px]"
+      />
     </div>
   );
 }

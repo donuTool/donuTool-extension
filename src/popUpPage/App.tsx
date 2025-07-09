@@ -5,7 +5,7 @@ import SettingPage from "@/popUpPage/pages/SettingPage";
 function App() {
   return (
     <>
-      <div className="absolute -z-50 w-[350px] h-[400px] bg-gray-300"></div>
+      <div className="absolute -z-50 h-[400px] w-[350px] bg-gray-300"></div>
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/setting" element={<SettingPage />} />
