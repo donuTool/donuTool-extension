@@ -106,19 +106,6 @@ function handlePrint() {
   });
 }
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete" && tab.url && (tab.url.startsWith("http://") || tab.url.startsWith("https://"))) {
-    chrome.storage.local.get("donuToolActive", (data) => {
-      if (data.donuToolActive) {
-        chrome.scripting.executeScript({
-          target: { tabId },
-          files: ["overlay/injectToolBarUI.js"],
-        });
-      }
-    });
-  }
-});
-
 function handleTranslate() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const originalUrl = tabs[0].url;
