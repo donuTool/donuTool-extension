@@ -1,7 +1,7 @@
 (async () => {
   const { updateToolBarUIPosition, checkCursorEvent, getRotationAngle, getReverseRotationAngle } = await import(chrome.runtime.getURL("overlay/toolBarUtils.js"));
   const { createToolBarElement } = await import(chrome.runtime.getURL("overlay/toolBarElement.js"));
-  const { handleMessageAction } = await import(chrome.runtime.getURL("overlay/handleMessageAction.js"));
+  const { textGeneratorWithMessage } = await import(chrome.runtime.getURL("overlay/textGeneratorWithMessage.js"));
 
   const alertBox = document.createElement("div");
   Object.assign(alertBox.style, {
@@ -31,7 +31,7 @@
   });
 
   chrome.runtime.onMessage.addListener((message) => {
-    const result = handleMessageAction[message.action]?.(message);
+    const result = textGeneratorWithMessage[message.action]?.(message);
 
     if (result) {
       alertBox.innerText = result;

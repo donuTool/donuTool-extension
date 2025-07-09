@@ -1,4 +1,4 @@
-export const handleMessageAction = {
+export const textGeneratorWithMessage = {
   showBookmarkAlert: (message) => {
     return `${trimTitle(message.title)} 페이지 북마크 완료`;
   },
