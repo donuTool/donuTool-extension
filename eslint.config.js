@@ -13,7 +13,10 @@ export default defineConfig([
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
     languageOptions: {
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        chrome: "readonly",
+      },
     },
   },
   tseslint.configs.recommended,
