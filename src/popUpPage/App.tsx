@@ -6,7 +6,7 @@ import SettingPage from "@/popUpPage/pages/SettingPage";
 import { googleLogin } from "@/auth/googleLogin";
 
 function App() {
-  const setIsDarkMode = useThemeStore((state) => state.setIsDarkMode);
+  const { isDarkMode, setIsDarkMode } = useThemeStore();
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -21,6 +21,11 @@ function App() {
     return () => media.removeEventListener("change", updateMode);
   }, []);
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    chrome.storage?.local.set({ isDarkMode: !isDarkMode });
+  };
+
   const logInWithGoogle = async () => {
     try {
       const data = await googleLogin();
@@ -33,12 +38,18 @@ function App() {
   return (
     <>
       <div className="dark:bg-donutool-bg absolute -z-50 h-[400px] w-[350px] bg-gray-300 transition duration-300"></div>
+      <button
+        onClick={toggleTheme}
+        className="dark:bg-donutool-button dark:text-donutool-text absolute right-3 bottom-3 flex cursor-pointer items-center justify-center rounded-full bg-gray-100 p-1 px-3.5 py-2 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
+      >
+        {isDarkMode ? "Light" : "Dark"}
+      </button>
       <Routes>
         <Route
           path="/"
           element={
             <>
-              <h2 className="dark:text-donutool-text mb-4 text-3xl font-black text-neutral-600 select-none">
+              <h2 className="dark:text-donutool-text mb-4 text-3xl font-black text-neutral-600 transition duration-300 select-none">
                 DonuTool
               </h2>
               <button

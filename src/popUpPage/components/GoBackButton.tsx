@@ -4,7 +4,7 @@ export default function GoBackButton() {
   const navigate = useNavigate();
 
   const goBackToMainPage = () => {
-    navigate("/");
+    navigate("/main");
   };
 
   return (
