@@ -143,7 +143,7 @@ export default function SettingPage() {
   return (
     <>
       <GoBackButton />
-      <div className="dark:text-donutool-text mb-7 text-2xl font-bold text-neutral-600 select-none">
+      <div className="dark:text-donutool-text mb-7 text-2xl font-bold text-neutral-600 transition duration-300 select-none">
         설정
       </div>
       <DndContext onDragEnd={handleDragEnd}>
@@ -153,11 +153,11 @@ export default function SettingPage() {
         </div>
       </DndContext>
       <input
-        className="dark:bg-donutool-button dark:text-donutool-text my-2 h-7 w-45 rounded-lg bg-neutral-100 text-center transition-all placeholder:text-center focus:outline-none"
+        className="dark:bg-donutool-button dark:text-donutool-text my-2 h-7 w-45 rounded-lg bg-neutral-100 text-center transition-all duration-300 placeholder:text-center focus:outline-none"
         placeholder="변경할 주소를 입력하세요"
         onKeyDown={setAddressOfNewTab}
       />
-      <div className="dark:text-donutool-text text-neutral-500 select-none">
+      <div className="dark:text-donutool-text text-neutral-500 transition duration-300 select-none">
         현재 주소 :{" "}
         <a
           href={address}
