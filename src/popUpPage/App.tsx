@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { useThemeStore } from "@/stores/useThemeStore";
 import MainPage from "@/popUpPage/pages/MainPage";
 import SettingPage from "@/popUpPage/pages/SettingPage";
+import { googleLogin } from "@/auth/googleLogin";
 
 function App() {
   const setIsDarkMode = useThemeStore((state) => state.setIsDarkMode);
@@ -20,11 +21,36 @@ function App() {
     return () => media.removeEventListener("change", updateMode);
   }, []);
 
+  const logInWithGoogle = async () => {
+    try {
+      const data = await googleLogin();
+      console.log("Logged in: ", data.user);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <>
-      <div className="dark:bg-donutool-bg absolute -z-50 h-[400px] w-[350px] bg-gray-300"></div>
+      <div className="dark:bg-donutool-bg absolute -z-50 h-[400px] w-[350px] bg-gray-300 transition duration-300"></div>
       <Routes>
-        <Route path="/" element={<MainPage />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <h2 className="dark:text-donutool-text mb-4 text-3xl font-black text-neutral-600 select-none">
+                DonuTool
+              </h2>
+              <button
+                onClick={logInWithGoogle}
+                className="dark:bg-donutool-button dark:text-donutool-text flex cursor-pointer items-center justify-center rounded-full bg-gray-100 p-1 px-3.5 py-2 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
+              >
+                로그인
+              </button>
+            </>
+          }
+        />
+        <Route path="/main" element={<MainPage />} />
         <Route path="/setting" element={<SettingPage />} />
       </Routes>
     </>

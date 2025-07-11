@@ -9,6 +9,10 @@
     "48": "assets/donuTool-logo-white.png",
     "128": "assets/donuTool-logo-white.png"
   },
+  "oauth2": {
+    "client_id": "325276288422-aahdc7m6294700qevqsad4g5vgng904g.apps.googleusercontent.com",
+    "scopes": [""]
+  },
   "action": {
     "default_popup": "index.html"
   },
@@ -22,6 +26,16 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "permissions": ["storage", "scripting", "activeTab", "tabs", "bookmarks", "clipboardWrite", "downloads"],
-  "host_permissions": ["<all_urls>"]
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab",
+    "tabs",
+    "bookmarks",
+    "clipboardWrite",
+    "downloads",
+    "identity"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuqynYg9qo1fJVzTytYhswLBGrRpnWV0um012dC+8qymte6QAG5jqeoQRkC4KM9GQq0kGzHIKF5fSt433iriO3h8A5xRfX9ZouyVtDbTahDfS0rTaR6UYqcs1CvZnyuYb12zNF/xwpaHt5uiGPA9SBZzxeMc76hkwMUasa4A+3rByQtXivK7ZtdUYZc+Qe5yLFL01JJP1icWyQpz0EcBvwbycPGaqXR88lWPwZ0nqGlSX7cCga40HJ96lUGEKhKddhXuIL8fLwhSBO5JURYYskOERsSmLC47UVF7eTls/GUo4ZvQxYcxC6DpyEqa5glfFwySPnprOWbiPCT2OHKGHUwIDAQAB"
 }
