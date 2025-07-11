@@ -9,6 +9,10 @@
     "48": "assets/donuTool-logo-white.png",
     "128": "assets/donuTool-logo-white.png"
   },
+  "oauth2": {
+    "client_id": "REMOVED",
+    "scopes": [""]
+  },
   "action": {
     "default_popup": "index.html"
   },
@@ -22,6 +26,16 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "permissions": ["storage", "scripting", "activeTab", "tabs", "bookmarks", "clipboardWrite", "downloads"],
-  "host_permissions": ["<all_urls>"]
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab",
+    "tabs",
+    "bookmarks",
+    "clipboardWrite",
+    "downloads",
+    "identity"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "key": "REMOVED"
 }
