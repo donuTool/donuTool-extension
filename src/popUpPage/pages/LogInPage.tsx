@@ -2,21 +2,36 @@ import { useNavigate } from "react-router-dom";
 import { googleLogin } from "@/auth/googleLogin";
 import { FcGoogle } from "react-icons/fc";
 import { BsPersonCircle } from "react-icons/bs";
+import { useButtonStore } from "@/stores/useButtonStore";
+import { useThemeStore } from "@/stores/useThemeStore";
 import Title from "@/popUpPage//components/Title";
 
 export default function LogInPage() {
   const navigate = useNavigate();
+  const setButtons = useButtonStore((state) => state.setButtons);
+  const setIsDarkMode = useThemeStore((state) => state.setIsDarkMode);
 
   const logInWithGoogle = async () => {
     try {
       const data = await googleLogin({ prompt: "select_account" });
-      chrome.storage?.local.set({ jwt: data.token, user: data.user }, () => {
-        if (chrome.runtime.lastError) {
-          alert(`Storage error: ${chrome.runtime.lastError.message}`);
-          return;
-        }
-        navigate("/main");
-      });
+      chrome.storage?.local.set(
+        {
+          jwt: data.token,
+          user: data.user,
+          buttonsSetting: data.user.buttonsSetting,
+          isDarkMode: data.user.isDarkMode,
+        },
+        () => {
+          if (chrome.runtime.lastError) {
+            alert(`Storage error: ${chrome.runtime.lastError.message}`);
+            return;
+          }
+          navigate("/main");
+        },
+      );
+
+      setButtons(data.user.buttonsSetting);
+      setIsDarkMode(data.user.isDarkMode);
     } catch (e) {
       alert(`Error: 로그인 실패 ${e}`);
     }
