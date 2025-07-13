@@ -5,11 +5,13 @@ import { BsPersonCircle } from "react-icons/bs";
 import { useButtonStore } from "@/stores/useButtonStore";
 import { useThemeStore } from "@/stores/useThemeStore";
 import Title from "@/popUpPage//components/Title";
+import { useAddressStore } from "@/stores/useAddressStore";
 
 export default function LogInPage() {
   const navigate = useNavigate();
   const setButtons = useButtonStore((state) => state.setButtons);
   const setIsDarkMode = useThemeStore((state) => state.setIsDarkMode);
+  const setAddress = useAddressStore((state) => state.setAddress);
 
   const logInWithGoogle = async () => {
     try {
@@ -20,6 +22,7 @@ export default function LogInPage() {
           user: data.user,
           buttonsSetting: data.user.buttonsSetting,
           isDarkMode: data.user.isDarkMode,
+          addressOfNewTab: data.user.addressOfNewTab,
         },
         () => {
           if (chrome.runtime.lastError) {
@@ -32,6 +35,7 @@ export default function LogInPage() {
 
       setButtons(data.user.buttonsSetting);
       setIsDarkMode(data.user.isDarkMode);
+      setAddress(data.user.addressOfNewTab);
     } catch (e) {
       alert(`Error: 로그인 실패 ${e}`);
     }
