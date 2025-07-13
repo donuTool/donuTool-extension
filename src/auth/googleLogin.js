@@ -28,19 +28,34 @@ export async function googleLogin(options = {}) {
         if (!code) return reject("No code returned");
 
         try {
-          const res = await fetch("http://localhost:3001/auth/google/token", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code, redirectUri: REDIRECT_URI }),
-          });
+          chrome.storage.local.get(
+            ["buttonsSetting", "isDarkMode"],
+            async (result) => {
+              const initialButtonsSetting = result.buttonsSetting || [];
+              const initialIsDarkMode = result.isDarkMode ?? false;
 
-          if (!res.ok) {
-            return reject("Failed to exchange code for token");
-          }
+              const res = await fetch(
+                "http://localhost:3001/auth/google/token",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    code,
+                    redirectUri: REDIRECT_URI,
+                    buttonsSetting: initialButtonsSetting,
+                    isDarkMode: initialIsDarkMode,
+                  }),
+                },
+              );
 
-          const data = await res.json();
+              if (!res.ok) {
+                return reject("Failed to exchange code for token");
+              }
 
-          resolve(data);
+              const data = await res.json();
+              resolve(data);
+            },
+          );
         } catch (err) {
           reject(err);
         }
