@@ -1,31 +1,26 @@
 import { useThemeStore } from "@/stores/useThemeStore";
-import { useEffect } from "react";
 import SunIcon from "@/assets/sun.svg?react";
 import MoonIcon from "@/assets/moon.svg?react";
 
 export default function ThemeToggleButton() {
   const { isDarkMode, setIsDarkMode } = useThemeStore();
 
-  useEffect(() => {
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    chrome.storage?.local.set({ isDarkMode: !isDarkMode });
+
     chrome.storage?.local.get(["user"], (data) => {
       if (data.user) {
         const googleId = data.user.googleId;
-
         fetch(`http://localhost:3001/api/user/${googleId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ isDarkMode: isDarkMode }),
+          body: JSON.stringify({ isDarkMode: !isDarkMode }),
         }).catch((err) =>
-          console.error("Failed to update buttonsSetting to server:", err),
+          console.error("Failed to update isDarkMode to server:", err),
         );
       }
     });
-
-    chrome.storage?.local.set({ isDarkMode: !isDarkMode });
-  }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
   };
 
   return (
