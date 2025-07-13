@@ -1,6 +1,4 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useButtonStore } from "@/stores/useButtonStore";
 import Title from "@/popUpPage//components/Title";
 import SetFullscreenButton from "@/popUpPage/components/buttons/SetFullscreenButton";
 import StartButton from "@/popUpPage/components/buttons/StartButton";
@@ -8,12 +6,6 @@ import StopButton from "@/popUpPage/components/buttons/StopButton";
 import GoToOptionButton from "@/popUpPage/components/buttons/GoToOptionButton";
 
 export default function MainPage() {
-  const buttons = useButtonStore((state) => state.buttons);
-
-  useEffect(() => {
-    chrome.storage?.local.set({ buttonsSetting: buttons });
-  }, [buttons]);
-
   const navigate = useNavigate();
 
   const logOutWithGoogle = () => {
