@@ -1,21 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useButtonStore } from "@/stores/useButtonStore";
-import SetFullscreenButton from "@/popUpPage/components/SetFullscreenButton";
-import StartButton from "@/popUpPage/components/StartButton";
-import StopButton from "@/popUpPage/components/StopButton";
-import GoToOptionButton from "@/popUpPage/components/GoToOptionButton";
+import Title from "@/popUpPage//components/Title";
+import SetFullscreenButton from "@/popUpPage/components/buttons/SetFullscreenButton";
+import StartButton from "@/popUpPage/components/buttons/StartButton";
+import StopButton from "@/popUpPage/components/buttons/StopButton";
+import GoToOptionButton from "@/popUpPage/components/buttons/GoToOptionButton";
 
 export default function MainPage() {
   const buttons = useButtonStore((state) => state.buttons);
-
-  function Title() {
-    return (
-      <h2 className="dark:text-donutool-text mb-4 text-3xl font-black text-neutral-600 transition duration-300 select-none">
-        DonuTool
-      </h2>
-    );
-  }
 
   useEffect(() => {
     chrome.storage?.local.set({ buttonsSetting: buttons });

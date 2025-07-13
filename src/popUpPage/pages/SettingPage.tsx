@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useButtonStore } from "@/stores/useButtonStore";
-import GoBackButton from "@/popUpPage/components/GoBackButton";
+import GoBackButton from "@/popUpPage/components/buttons/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
 
