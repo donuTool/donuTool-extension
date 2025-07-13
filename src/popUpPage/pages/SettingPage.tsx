@@ -1,55 +1,14 @@
 import { useEffect, useState } from "react";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { Button } from "@/stores/types";
 import { useThemeStore } from "@/stores/useThemeStore";
+import { useButtonStore } from "@/stores/useButtonStore";
 import GoBackButton from "@/popUpPage/components/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
 
-const INITIAL_BUTTONS: Button[] = [
-  {
-    id: "goBack",
-    image: "arrow-left",
-    status: "IN_TOOLBAR",
-    top: 15,
-    left: 93.3,
-  },
-  {
-    id: "goForward",
-    image: "arrow-right",
-    status: "IN_TOOLBAR",
-    top: 53.3,
-    left: 109.2,
-  },
-  { id: "newTab", image: "new", status: "IN_TOOLBAR", top: 93.3, left: 93.3 },
-  {
-    id: "moveToNextTab",
-    image: "arrow-right-to-line",
-    status: "IN_TOOLBAR",
-    top: 109.2,
-    left: 53.3,
-  },
-  {
-    id: "moveToPrevTab",
-    image: "arrow-left-to-line",
-    status: "IN_TOOLBAR",
-    top: 92.5,
-    left: 15.8,
-  },
-  { id: "reload", image: "rotate", status: "IN_LIST" },
-  { id: "close", image: "close", status: "IN_LIST" },
-  { id: "translate", image: "languages", status: "IN_LIST" },
-  { id: "downloadImages", image: "image-down", status: "IN_LIST" },
-  { id: "bookmark", image: "star", status: "IN_LIST" },
-  { id: "bookmark2", image: "bookmark", status: "IN_LIST" },
-  { id: "copyTabAddress", image: "clipboard-copy", status: "IN_LIST" },
-  { id: "print", image: "printer", status: "IN_LIST" },
-  { id: "capture", image: "camera", status: "IN_LIST" },
-];
-
 export default function SettingPage() {
   const [address, setAddress] = useState("https://google.com");
-  const [buttons, setButtons] = useState<Button[]>(INITIAL_BUTTONS);
+  const { buttons, setButtons } = useButtonStore();
 
   const isDarkMode = useThemeStore((state) => state.isDarkMode);
 
@@ -114,7 +73,6 @@ export default function SettingPage() {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
     if (!over) return;
 
     const activeId = String(active.id);
@@ -148,8 +106,8 @@ export default function SettingPage() {
       </div>
       <DndContext onDragEnd={handleDragEnd}>
         <div className="mb-10 flex items-center justify-center gap-5">
-          <VirtualToolBar buttons={buttons} />
-          <ButtonsInList buttons={buttons} />
+          <VirtualToolBar />
+          <ButtonsInList />
         </div>
       </DndContext>
       <input

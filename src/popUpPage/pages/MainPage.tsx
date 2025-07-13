@@ -1,10 +1,14 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useButtonStore } from "@/stores/useButtonStore";
 import SetFullscreenButton from "@/popUpPage/components/SetFullscreenButton";
 import StartButton from "@/popUpPage/components/StartButton";
 import StopButton from "@/popUpPage/components/StopButton";
 import GoToOptionButton from "@/popUpPage/components/GoToOptionButton";
 
 export default function MainPage() {
+  const buttons = useButtonStore((state) => state.buttons);
+
   function Title() {
     return (
       <h2 className="dark:text-donutool-text mb-4 text-3xl font-black text-neutral-600 transition duration-300 select-none">
@@ -12,6 +16,10 @@ export default function MainPage() {
       </h2>
     );
   }
+
+  useEffect(() => {
+    chrome.storage?.local.set({ buttonsSetting: buttons });
+  }, [buttons]);
 
   const navigate = useNavigate();
 

@@ -1,9 +1,7 @@
-export type ButtonStatus = "IN_TOOLBAR" | "IN_LIST";
-
 export type Button = {
   id: string;
   image: string;
-  status: ButtonStatus;
+  status: string;
   top?: number;
   left?: number;
 };
