@@ -40,11 +40,16 @@ function App() {
 
   const logInWithGoogle = async () => {
     try {
-      const data = await googleLogin();
-      chrome.storage?.local.set({ user: data.user });
-      navigate("/main");
+      const data = await googleLogin({ prompt: "select_account" });
+      chrome.storage?.local.set({ jwt: data.token, user: data.user }, () => {
+        if (chrome.runtime.lastError) {
+          alert(`Storage error: ${chrome.runtime.lastError.message}`);
+          return;
+        }
+        navigate("/main");
+      });
     } catch (e) {
-      alert(`Error: ${e}`);
+      alert(`Error: 로그인 실패 ${e}`);
     }
   };
 

@@ -4,13 +4,17 @@ const REDIRECT_URI =
   typeof chrome !== "undefined" && chrome.runtime?.id
     ? `https://${chrome.runtime.id}.chromiumapp.org/`
     : "";
-export async function googleLogin() {
-  const authUrl =
+export async function googleLogin(options = {}) {
+  let authUrl =
     `https://accounts.google.com/o/oauth2/v2/auth` +
     `?client_id=${CLIENT_ID}` +
     `&response_type=code` +
     `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
     `&scope=openid email profile`;
+
+  if (options.prompt) {
+    authUrl += `&prompt=${encodeURIComponent(options.prompt)}`;
+  }
 
   return new Promise((resolve, reject) => {
     chrome.identity.launchWebAuthFlow(
@@ -24,17 +28,18 @@ export async function googleLogin() {
         if (!code) return reject("No code returned");
 
         try {
-          const res = await fetch(
-            "http://localhost:3001/auth/google/callback",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ code, redirectUri: REDIRECT_URI }),
-            },
-          );
+          const res = await fetch("http://localhost:3001/auth/google/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code, redirectUri: REDIRECT_URI }),
+          });
+
+          if (!res.ok) {
+            return reject("Failed to exchange code for token");
+          }
+
           const data = await res.json();
 
-          chrome.storage.local.set({ jwt: data.token, user: data.user });
           resolve(data);
         } catch (err) {
           reject(err);
