@@ -21,6 +21,20 @@ export default function SettingPage() {
   }, []);
 
   useEffect(() => {
+    chrome.storage?.local.get(["user"], (data) => {
+      if (data.user) {
+        const googleId = data.user.googleId;
+
+        fetch(`http://localhost:3001/api/user/${googleId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ buttonsSetting: buttons }),
+        }).catch((err) =>
+          console.error("Failed to update buttonsSetting to server:", err),
+        );
+      }
+    });
+
     chrome.storage?.local.set({ buttonsSetting: buttons });
   }, [buttons]);
 
