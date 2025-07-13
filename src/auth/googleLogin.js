@@ -29,10 +29,12 @@ export async function googleLogin(options = {}) {
 
         try {
           chrome.storage.local.get(
-            ["buttonsSetting", "isDarkMode"],
+            ["buttonsSetting", "isDarkMode", "addressOfNewTab"],
             async (result) => {
               const initialButtonsSetting = result.buttonsSetting || [];
               const initialIsDarkMode = result.isDarkMode ?? false;
+              const initialAddressOfNewTab =
+                result.addressOfNewTab ?? "https://google.com";
 
               const res = await fetch(
                 "http://localhost:3001/auth/google/token",
@@ -44,6 +46,7 @@ export async function googleLogin(options = {}) {
                     redirectUri: REDIRECT_URI,
                     buttonsSetting: initialButtonsSetting,
                     isDarkMode: initialIsDarkMode,
+                    addressOfNewTab: initialAddressOfNewTab,
                   }),
                 },
               );

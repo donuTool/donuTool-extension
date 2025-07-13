@@ -1,21 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useButtonStore } from "@/stores/useButtonStore";
 import GoBackButton from "@/popUpPage/components/buttons/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
+import { useAddressStore } from "@/stores/useAddressStore";
 
 export default function SettingPage() {
-  const [address, setAddress] = useState("https://google.com");
-  const { buttons, setButtons } = useButtonStore();
-
   const isDarkMode = useThemeStore((state) => state.isDarkMode);
+  const { buttons, setButtons } = useButtonStore();
+  const { address, setAddress } = useAddressStore();
 
   useEffect(() => {
-    chrome.storage?.local.get("buttonsSetting", (data) => {
-      if (data.buttonsSetting) {
-        setButtons(data.buttonsSetting);
+    chrome.storage?.local.get(["user"], (data) => {
+      if (data.user) {
+        const googleId = data.user.googleId;
+        fetch(`http://localhost:3001/api/user/${googleId}`)
+          .then((res) => res.json())
+          .then((serverUser) => {
+            if (serverUser?.buttonsSetting) {
+              setButtons(serverUser.buttonsSetting);
+              chrome.storage?.local.set({
+                buttonsSetting: serverUser.buttonsSetting,
+              });
+            }
+          })
+          .catch((err) =>
+            console.error("Failed to fetch buttonsSetting from server:", err),
+          );
+      }
+    });
+
+    chrome.storage?.local.get("addressOfNewTab", (data) => {
+      if (data.addressOfNewTab) {
+        setAddress(data.addressOfNewTab);
       }
     });
   }, []);
@@ -38,11 +57,23 @@ export default function SettingPage() {
     chrome.storage?.local.set({ buttonsSetting: buttons });
   }, [buttons]);
 
-  chrome.storage?.local.get("addressOfNewTab", (data) => {
-    if (data.addressOfNewTab) {
-      setAddress(data.addressOfNewTab);
-    }
-  });
+  useEffect(() => {
+    chrome.storage?.local.get(["user"], (data) => {
+      if (data.user) {
+        const googleId = data.user.googleId;
+
+        fetch(`http://localhost:3001/api/user/${googleId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ addressOfNewTab: address }),
+        }).catch((err) =>
+          console.error("Failed to update addressOfNewTab to server:", err),
+        );
+      }
+    });
+
+    chrome.storage?.local.set({ addressOfNewTab: address });
+  }, [address]);
 
   const setAddressOfNewTab = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
