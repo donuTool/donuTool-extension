@@ -25,13 +25,8 @@ function App() {
         setIsDarkMode(result.isDarkMode);
       } else {
         const media = window.matchMedia("(prefers-color-scheme: dark)");
-        const updateMode = () => {
-          setIsDarkMode(media.matches);
-          chrome.storage?.local.set({ isDarkMode: media.matches });
-        };
-        updateMode();
-        media.addEventListener("change", updateMode);
-        return () => media.removeEventListener("change", updateMode);
+        setIsDarkMode(media.matches);
+        chrome.storage?.local.set({ isDarkMode: media.matches });
       }
     });
 
