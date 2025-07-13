@@ -10,7 +10,14 @@ export default function MainPage() {
 
   const logOutWithGoogle = () => {
     chrome.storage?.local.remove(
-      ["buttonsSetting", "donuToolActive", "user", "jwt"],
+      [
+        "buttonsSetting",
+        "isDarkMode",
+        "addressOfNewTab",
+        "donuToolActive",
+        "user",
+        "jwt",
+      ],
       () => {
         if (chrome.runtime.lastError) {
           alert(`Storage error: ${chrome.runtime.lastError.message}`);
