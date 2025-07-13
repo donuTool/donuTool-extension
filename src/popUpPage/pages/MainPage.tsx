@@ -24,13 +24,16 @@ export default function MainPage() {
   const navigate = useNavigate();
 
   const logOutWithGoogle = () => {
-    chrome.storage?.local.remove(["user", "jwt"], () => {
-      if (chrome.runtime.lastError) {
-        alert(`Storage error: ${chrome.runtime.lastError.message}`);
-        return;
-      }
-      navigate("/");
-    });
+    chrome.storage?.local.remove(
+      ["buttonsSetting", "donuToolActive", "user", "jwt"],
+      () => {
+        if (chrome.runtime.lastError) {
+          alert(`Storage error: ${chrome.runtime.lastError.message}`);
+          return;
+        }
+        navigate("/");
+      },
+    );
   };
 
   return (
