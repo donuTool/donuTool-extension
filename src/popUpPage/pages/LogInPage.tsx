@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { googleLogin } from "@/auth/googleLogin";
+import { FcGoogle } from "react-icons/fc";
+import { BsPersonCircle } from "react-icons/bs";
 import Title from "@/popUpPage//components/Title";
 
 export default function LogInPage() {
@@ -31,16 +33,18 @@ export default function LogInPage() {
       <Title />
       <button
         onClick={logInWithGoogle}
-        className="dark:bg-donutool-button dark:text-donutool-text mt-4 flex w-30 cursor-pointer items-center justify-center rounded-full bg-gray-100 py-2 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
+        className="dark:bg-donutool-button dark:text-donutool-text relative mt-2 flex w-40 cursor-pointer items-center rounded-full bg-gray-100 py-2 pr-2 pl-8 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
       >
-        로그인
+        <FcGoogle className="absolute left-3 h-4 w-4" />
+        <span className="flex-1 text-center">Google로 로그인</span>
       </button>
-      <div className="dark:bg-donutool-text my-3 h-px w-30 bg-neutral-400"></div>
+      <div className="dark:bg-donutool-text my-2.5 h-[0.5px] w-38 bg-neutral-400"></div>
       <button
         onClick={goToMainPage}
-        className="dark:bg-donutool-button dark:text-donutool-text flex w-30 cursor-pointer items-center justify-center rounded-full bg-gray-100 py-2 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
+        className="dark:bg-donutool-button dark:text-donutool-text relative flex w-40 cursor-pointer items-center rounded-full bg-gray-100 py-2 pr-3 pl-8 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
       >
-        게스트
+        <BsPersonCircle className="absolute left-3 h-4 w-4" />
+        <span className="flex-1 text-center">Guest로 로그인</span>
       </button>
     </>
   );
