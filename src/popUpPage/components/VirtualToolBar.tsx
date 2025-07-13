@@ -1,9 +1,11 @@
+import { useButtonStore } from "@/stores/useButtonStore";
 import donuToolBar from "@/assets/donuToolBar.png";
-import { Button } from "@/stores/types";
 import DroppableArea from "@/popUpPage/utils/DroppableArea";
 import DraggableButton from "@/popUpPage/utils/DraggableButton";
 
-export default function VirtualToolBar({ buttons }: { buttons: Button[] }) {
+export default function VirtualToolBar() {
+  const buttons = useButtonStore((state) => state.buttons);
+
   return (
     <div className="relative">
       <img

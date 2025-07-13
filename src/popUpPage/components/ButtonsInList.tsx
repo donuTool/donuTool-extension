@@ -1,8 +1,10 @@
-import { Button } from "@/stores/types";
+import { useButtonStore } from "@/stores/useButtonStore";
 import DroppableArea from "@/popUpPage/utils/DroppableArea";
 import DraggableButton from "@/popUpPage/utils/DraggableButton";
 
-export default function ButtonsInList({ buttons }: { buttons: Button[] }) {
+export default function ButtonsInList() {
+  const buttons = useButtonStore((state) => state.buttons);
+
   return (
     <div className="grid grid-cols-3 gap-2">
       {buttons
