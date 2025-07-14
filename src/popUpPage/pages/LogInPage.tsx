@@ -4,8 +4,9 @@ import { FcGoogle } from "react-icons/fc";
 import { BsPersonCircle } from "react-icons/bs";
 import { useButtonStore } from "@/stores/useButtonStore";
 import { useThemeStore } from "@/stores/useThemeStore";
-import Title from "@/popUpPage//components/Title";
 import { useAddressStore } from "@/stores/useAddressStore";
+import Title from "@/popUpPage/components/Title";
+import LoginButton from "@/popUpPage/components/buttons/LogInButton";
 
 export default function LogInPage() {
   const navigate = useNavigate();
@@ -50,21 +51,18 @@ export default function LogInPage() {
   return (
     <>
       <Title />
-      <button
+      <LoginButton
         onClick={logInWithGoogle}
-        className="dark:bg-donutool-button dark:text-donutool-text relative mt-2 flex w-40 cursor-pointer items-center rounded-full bg-gray-100 py-2 pr-2 pl-8 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
-      >
-        <FcGoogle className="absolute left-3 h-4 w-4" />
-        <span className="flex-1 text-center">Google로 로그인</span>
-      </button>
+        icon={<FcGoogle className="absolute left-3 h-4 w-4" />}
+        label="Google로 로그인"
+        extraClassName="mt-2 pr-2"
+      />
       <div className="dark:bg-donutool-text my-2.5 h-[0.5px] w-38 bg-neutral-400"></div>
-      <button
+      <LoginButton
         onClick={goToMainPage}
-        className="dark:bg-donutool-button dark:text-donutool-text relative flex w-40 cursor-pointer items-center rounded-full bg-gray-100 py-2 pr-3 pl-8 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
-      >
-        <BsPersonCircle className="absolute left-3 h-4 w-4" />
-        <span className="flex-1 text-center">Guest로 로그인</span>
-      </button>
+        icon={<BsPersonCircle className="absolute left-3 h-4 w-4" />}
+        label="Guest로 로그인"
+      />
     </>
   );
 }
