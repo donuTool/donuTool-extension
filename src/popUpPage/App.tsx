@@ -11,13 +11,36 @@ import ThemeToggleButton from "@/popUpPage/components/buttons/ThemeToggleButton"
 
 function App() {
   const setIsDarkMode = useThemeStore((state) => state.setIsDarkMode);
-  const buttons = useButtonStore((state) => state.buttons);
+  const { buttons, setButtons } = useButtonStore();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    chrome.storage?.local.set({ buttonsSetting: buttons });
-  }, [buttons]);
+    chrome.storage?.local.get(["buttonsSetting"], (result) => {
+      if (result.buttonsSetting && result.buttonsSetting.length > 0) {
+        setButtons(result.buttonsSetting);
+      } else {
+        chrome.storage?.local.get(["user"], (data) => {
+          if (data.user) {
+            fetch(`http://localhost:3001/api/user/${data.user.googleId}`)
+              .then((res) => res.json())
+              .then((serverUser) => {
+                if (serverUser?.buttonsSetting?.length > 0) {
+                  setButtons(serverUser.buttonsSetting);
+                  chrome.storage?.local.set({
+                    buttonsSetting: serverUser.buttonsSetting,
+                  });
+                } else {
+                  chrome.storage?.local.set({ buttonsSetting: buttons });
+                }
+              });
+          } else {
+            chrome.storage?.local.set({ buttonsSetting: buttons });
+          }
+        });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     chrome.storage?.local.get("isDarkMode", (result) => {
