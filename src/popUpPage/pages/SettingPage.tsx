@@ -54,7 +54,15 @@ export default function SettingPage() {
       }
     });
 
-    chrome.storage?.local.set({ buttonsSetting: buttons });
+    chrome.storage?.local.set({ buttonsSetting: buttons }, () => {
+      chrome.tabs.query({}, (tabs) => {
+        tabs.forEach((tab) => {
+          if (tab.id !== undefined) {
+            chrome.tabs.sendMessage(tab.id, { action: "updateToolBar" });
+          }
+        });
+      });
+    });
   }, [buttons]);
 
   useEffect(() => {

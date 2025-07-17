@@ -1,7 +1,16 @@
 (async () => {
-  const { updateToolBarUIPosition, checkCursorEvent, getRotationAngle, getReverseRotationAngle } = await import(chrome.runtime.getURL("overlay/toolBarUtils.js"));
-  const { createToolBarElement } = await import(chrome.runtime.getURL("overlay/toolBarElement.js"));
-  const { textGeneratorWithMessage } = await import(chrome.runtime.getURL("overlay/textGeneratorWithMessage.js"));
+  const {
+    updateToolBarUIPosition,
+    checkCursorEvent,
+    getRotationAngle,
+    getReverseRotationAngle,
+  } = await import(chrome.runtime.getURL("overlay/toolBarUtils.js"));
+  const { createToolBarElement } = await import(
+    chrome.runtime.getURL("overlay/toolBarElement.js")
+  );
+  const { textGeneratorWithMessage } = await import(
+    chrome.runtime.getURL("overlay/textGeneratorWithMessage.js")
+  );
 
   const alertBox = document.createElement("div");
   Object.assign(alertBox.style, {
@@ -24,9 +33,14 @@
   });
   document.body.appendChild(alertBox);
 
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === "local" && changes.buttonsSetting) {
-      toolBarUI = createToolBarElement();
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.action === "updateToolBar") {
+      toolBarUI.remove();
+
+      createToolBarElement().then((newToolBarUI) => {
+        toolBarUI = newToolBarUI;
+        document.body.appendChild(toolBarUI);
+      });
     }
   });
 
@@ -93,11 +107,22 @@
         y: e.pageY,
       };
       updateToolBarUIPosition(toolBarUI, lastCursorPosition);
-      toolBarUI.style.transform = getRotationAngle(e.clientX, e.clientY, window.innerWidth, window.innerHeight);
+      toolBarUI.style.transform = getRotationAngle(
+        e.clientX,
+        e.clientY,
+        window.innerWidth,
+        window.innerHeight,
+      );
 
       buttonsInToolBar.forEach((button) => {
-        button.style.transform = getReverseRotationAngle(e.clientX, e.clientY, window.innerWidth, window.innerHeight);
-        button.style.transition = "transform 0.3s ease, background-color 0.3s ease";
+        button.style.transform = getReverseRotationAngle(
+          e.clientX,
+          e.clientY,
+          window.innerWidth,
+          window.innerHeight,
+        );
+        button.style.transition =
+          "transform 0.3s ease, background-color 0.3s ease";
       });
     }
 
@@ -114,7 +139,7 @@
       lastScrollYPosition = window.scrollY;
       updateToolBarUIPosition(toolBarUI, lastCursorPosition);
     },
-    true
+    true,
   );
 
   window.addEventListener("keydown", (e) => {
@@ -131,7 +156,7 @@
             toolBarUI.style.display = "flex";
             chrome.storage.local.set({ donuToolActive: true });
           }
-        })
+        }),
       );
 
       alertBox.style.transform = "translateX(-50%) translateY(4vh)";
