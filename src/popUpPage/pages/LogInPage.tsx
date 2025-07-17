@@ -35,6 +35,9 @@ export default function LogInPage() {
             return;
           }
           navigate("/main");
+          chrome.tabs.create({
+            url: `http://localhost:5173?googleId=${data.user.googleId}`,
+          });
         },
       );
 
@@ -51,6 +54,7 @@ export default function LogInPage() {
   const goToMainPage = () => {
     chrome.storage?.local.set({ user: "guest" }, () => {
       navigate("/main");
+      chrome.tabs.create({ url: "http://localhost:5173" });
     });
   };
 
