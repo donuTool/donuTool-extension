@@ -3,9 +3,21 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  --color-donutool-dark: #22292b;
   --color-donutool-text: #b6b7b7;
   --color-donutool-bg: #343d3f;
+  --color-donutool-middle: #455154;
   --color-donutool-button: #57666a;
+  --color-donutool-bright: #d1d6d6;
+  --font-rix: "RixYeoljeongdo_Regular";
+}
+
+@font-face {
+  font-family: "RixYeoljeongdo_Regular";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2102-01@1.0/RixYeoljeongdo_Regular.woff")
+    format("woff");
+  font-weight: normal;
+  font-style: normal;
 }
 
 html,
