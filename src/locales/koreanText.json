@@ -1,0 +1,12 @@
+{
+  "loginWithGoogle": "Google로 로그인",
+  "loginWithGuestMode": "Guest로 로그인",
+  "fullscreen": "전체화면",
+  "start": "시작",
+  "stop": "종료",
+  "logout": "로그아웃",
+  "setting": "설정",
+  "goBack": "뒤로가기",
+  "typeAddress": "변경할 주소를 입력하세요",
+  "currentTabAddress": "현재 주소"
+}

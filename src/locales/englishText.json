@@ -1,0 +1,12 @@
+{
+  "loginWithGoogle": "Sign in with Google",
+  "loginWithGuestMode": "Continue as Guest",
+  "fullscreen": "Fullscreen",
+  "start": "START",
+  "stop": "STOP",
+  "logout": "Sign out",
+  "setting": "Settings",
+  "goBack": "Go Back",
+  "typeAddress": "Enter new address for New Tab",
+  "currentTabAddress": "Current Address"
+}
