@@ -1,4 +1,8 @@
+import { useTranslation } from "react-i18next";
+
 export default function StartButton() {
+  const { t } = useTranslation();
+
   const addToolBarUI = () => {
     chrome.storage.local.get("donuToolActive", async (data) => {
       if (!data.donuToolActive) {
@@ -21,7 +25,7 @@ export default function StartButton() {
       onClick={addToolBarUI}
       className="dark:bg-donutool-button dark:text-donutool-text absolute top-3 left-3 flex cursor-pointer items-center justify-center rounded-full bg-gray-100 p-1 px-3.5 py-2 text-xs font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
     >
-      시작
+      {t("start")}
     </button>
   );
 }

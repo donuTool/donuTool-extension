@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { googleLogin } from "@/auth/googleLogin";
 import { FcGoogle } from "react-icons/fc";
 import { BsPersonCircle } from "react-icons/bs";
@@ -10,6 +11,7 @@ import Title from "@/popUpPage/components/Title";
 import LoginButton from "@/popUpPage/components/buttons/LogInButton";
 
 export default function LogInPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const setButtons = useButtonStore((state) => state.setButtons);
   const setIsDarkMode = useThemeStore((state) => state.setIsDarkMode);
@@ -73,14 +75,14 @@ export default function LogInPage() {
           <LoginButton
             onClick={logInWithGoogle}
             icon={<FcGoogle className="absolute left-3 h-4 w-4" />}
-            label="Google로 로그인"
+            label={t("loginWithGoogle")}
             extraClassName="pr-2"
           />
           <div className="dark:bg-donutool-text my-2.5 h-[0.5px] w-38 bg-neutral-400"></div>
           <LoginButton
             onClick={goToMainPage}
             icon={<BsPersonCircle className="absolute left-3 h-4 w-4" />}
-            label="Guest로 로그인"
+            label={t("loginWithGuestMode")}
           />
         </div>
       )}
