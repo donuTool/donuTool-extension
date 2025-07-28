@@ -1,13 +1,15 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useButtonStore } from "@/stores/useButtonStore";
+import { useAddressStore } from "@/stores/useAddressStore";
 import GoBackButton from "@/popUpPage/components/buttons/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
-import { useAddressStore } from "@/stores/useAddressStore";
 
 export default function SettingPage() {
+  const { t } = useTranslation();
   const isDarkMode = useThemeStore((state) => state.isDarkMode);
   const { buttons, setButtons } = useButtonStore();
   const { address, setAddress } = useAddressStore();
@@ -155,7 +157,7 @@ export default function SettingPage() {
     <>
       <GoBackButton />
       <div className="dark:text-donutool-text mb-7 text-2xl font-bold text-neutral-600 transition duration-300 select-none">
-        설정
+        {t("setting")}
       </div>
       <DndContext onDragEnd={handleDragEnd}>
         <div className="mb-10 flex items-center justify-center gap-5">
@@ -165,11 +167,11 @@ export default function SettingPage() {
       </DndContext>
       <input
         className="dark:bg-donutool-button dark:text-donutool-text my-2 h-7 w-45 rounded-lg bg-neutral-100 text-center transition-all duration-300 placeholder:text-center focus:outline-none"
-        placeholder="변경할 주소를 입력하세요"
+        placeholder={t("typeAddress")}
         onKeyDown={setAddressOfNewTab}
       />
       <div className="dark:text-donutool-text text-neutral-500 transition duration-300 select-none">
-        현재 주소 :{" "}
+        {t("currentTabAddress")} :{" "}
         <a
           href={address}
           target="_blank"

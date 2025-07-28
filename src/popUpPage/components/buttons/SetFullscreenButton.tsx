@@ -1,4 +1,8 @@
+import { useTranslation } from "react-i18next";
+
 export default function SetFullscreenButton() {
+  const { t } = useTranslation();
+
   const setBrowserFullscreen = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0].id) {
@@ -12,7 +16,7 @@ export default function SetFullscreenButton() {
       onClick={setBrowserFullscreen}
       className="dark:bg-donutool-button dark:text-donutool-text flex cursor-pointer items-center justify-center rounded-xl bg-gray-100 p-1 px-3.5 py-2 font-semibold text-neutral-600 shadow transition duration-300 hover:shadow-md"
     >
-      전체화면
+      {t("fullscreen")}
     </button>
   );
 }
