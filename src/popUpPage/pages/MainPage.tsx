@@ -10,10 +10,14 @@ export default function MainPage() {
     <>
       <Title />
       <SetFullscreenButton />
-      <StartButton />
-      <StopButton />
-      <LogOutButton />
-      <GoToOptionButton />
+      <div className="absolute top-3 left-3 flex flex-row gap-2">
+        <StartButton />
+        <StopButton />
+      </div>
+      <div className="absolute top-3 right-3 flex flex-row gap-2">
+        <LogOutButton />
+        <GoToOptionButton />
+      </div>
     </>
   );
 }
