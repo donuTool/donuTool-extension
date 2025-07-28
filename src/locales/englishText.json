@@ -4,9 +4,7 @@
   "fullscreen": "Fullscreen",
   "start": "START",
   "stop": "STOP",
-  "logout": "Sign out",
   "setting": "Settings",
-  "goBack": "Go Back",
   "typeAddress": "Enter new address",
   "currentTabAddress": "Current Address"
 }
