@@ -38,7 +38,7 @@ export default function LogInPage() {
           }
           navigate("/main");
           chrome.tabs.create({
-            url: `http://localhost:5173?googleId=${data.user.googleId}`,
+            url: `http://www.donutool.site?googleId=${data.user.googleId}`,
           });
         },
       );
@@ -56,7 +56,7 @@ export default function LogInPage() {
   const goToMainPage = () => {
     chrome.storage?.local.set({ user: "guest" }, () => {
       navigate("/main");
-      chrome.tabs.create({ url: "http://localhost:5173" });
+      chrome.tabs.create({ url: "http://www.donutool.site" });
     });
   };
 
