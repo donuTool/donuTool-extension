@@ -16,7 +16,10 @@ function handleTabSwitch(message) {
   chrome.tabs.query({ currentWindow: true }, (tabs) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (activeTabs) => {
       const currentIndex = activeTabs[0].index;
-      const newIndex = message.action === "goToNextTab" ? (currentIndex + 1) % tabs.length : (currentIndex - 1 + tabs.length) % tabs.length;
+      const newIndex =
+        message.action === "goToNextTab"
+          ? (currentIndex + 1) % tabs.length
+          : (currentIndex - 1 + tabs.length) % tabs.length;
       chrome.tabs.update(tabs[newIndex].id, { active: true });
     });
   });
@@ -33,9 +36,12 @@ function handleCloseTab() {
 function handleBookmarkTab() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const tab = tabs[0];
-    const FOLDER_TITLE = "DonuTool 북마크 폴더";
+    const FOLDER_TITLE = "donuTool 북마크 폴더";
     chrome.bookmarks.search({ title: FOLDER_TITLE }, (results) => {
-      const folder = results.find((bookmarkNode) => bookmarkNode.title === FOLDER_TITLE && !bookmarkNode.url);
+      const folder = results.find(
+        (bookmarkNode) =>
+          bookmarkNode.title === FOLDER_TITLE && !bookmarkNode.url,
+      );
       const parentId = folder?.id;
       const createBookmark = (parentId) => {
         chrome.bookmarks.create({
@@ -101,7 +107,7 @@ function handlePrint() {
       },
       () => {
         isCapturing = false;
-      }
+      },
     );
   });
 }
@@ -119,7 +125,10 @@ function handleImageDownload() {
     const tab = tabs[0];
     const tabId = tab.id;
     const noSpaceTitle = tab.title.replace(/\s+/g, "");
-    const trimmedTitle = noSpaceTitle.length > 15 ? `${noSpaceTitle.slice(0, 15)}...` : noSpaceTitle;
+    const trimmedTitle =
+      noSpaceTitle.length > 15
+        ? `${noSpaceTitle.slice(0, 15)}...`
+        : noSpaceTitle;
     const safeTitle = trimmedTitle.replace(/[^\p{L}\p{N}_\-()\[\]]/gu, "_");
     chrome.scripting.executeScript(
       {
@@ -149,7 +158,7 @@ function handleImageDownload() {
         chrome.tabs.sendMessage(tab.id, {
           action: "imagesDownloadSuccess",
         });
-      }
+      },
     );
   });
 }
@@ -185,13 +194,17 @@ function handleCaptureTab() {
             isCapturing = false;
           });
         }, 100);
-      }
+      },
     );
   });
 }
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete" && tab.url && (tab.url.startsWith("http://") || tab.url.startsWith("https://"))) {
+  if (
+    changeInfo.status === "complete" &&
+    tab.url &&
+    (tab.url.startsWith("http://") || tab.url.startsWith("https://"))
+  ) {
     chrome.storage.local.get("donuToolActive", (data) => {
       if (data.donuToolActive) {
         chrome.scripting.executeScript({
