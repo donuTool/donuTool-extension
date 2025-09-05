@@ -6,5 +6,8 @@
   "stop": "종료",
   "setting": "설정",
   "typeAddress": "변경할 주소를 입력하세요",
-  "currentTabAddress": "현재 주소"
+  "currentTabAddress": "현재 주소",
+  "startGuide1": "앱 창의 왼쪽 상단의 초록색 버튼을 눌러 전체\n화면을 시작해주세요.",
+  "startGuide2": "화면 최상단 메뉴 바에서 보기 탭을 클릭한 뒤,\n\"전체화면에서 항상 툴바 표시 항목\"을 꺼주세요.",
+  "startGuide3": "확장프로그램 좌상단의 시작 버튼을 눌러\ndonuTool 사용을 시작하세요!"
 }
