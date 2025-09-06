@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "donuTool",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "donuTool is a floating cursor-following toolbar that offers instant, overlay-based access to essential tools.",
   "icons": {
     "16": "assets/donuTool-logo-white.png",

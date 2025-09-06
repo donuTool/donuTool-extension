@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node build-manifest.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -28,10 +28,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@rollup/plugin-replace": "^6.0.2",
     "@types/chrome": "^0.0.327",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
+    "dotenv": "^17.2.2",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-react": "^7.37.5",
