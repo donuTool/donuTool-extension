@@ -7,7 +7,9 @@
   "setting": "Settings",
   "typeAddress": "Enter new address",
   "currentTabAddress": "Current Address",
-  "startGuide1": "Press the green button at the top-left\ncorner of the app window to enter\nfull screen.",
-  "startGuide2": "In the menu bar at the top of the screen,\nclick View, then turn off Always Show\nToolbar in Full Screen.",
-  "startGuide3": "Click the Start button at the top-left\nof the extension to begin using donuTool!"
+  "startGuideForMac1": "Press the green button at the top-left\ncorner of the app window to enter\nfull screen.",
+  "startGuideForMac2": "In the menu bar at the top of the screen,\nclick View, then turn off Always Show\nToolbar in Full Screen.",
+  "startGuideForMac3": "Click the Start button at the top-left\nof the extension to begin using donuTool!",
+  "startGuideForWindows1": "Press the F11 key on your keyboard to\nactivate fullscreen mode.",
+  "startGuideForWindows2": "Press the start button at the top left\nof the extension to begin using donuTool!"
 }
