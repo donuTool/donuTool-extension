@@ -30,31 +30,85 @@ export async function createToolBarElement() {
     });
   });
 
-  const toolBarButtonElement1 = await createToolBarButton("donuTool-button1", "18px", "112px", buttonsSetting[0].image, buttonsSetting[0].id);
+  const toolBarButtonElement1 = await createToolBarButton(
+    "donuTool-button1",
+    "18px",
+    "112px",
+    buttonsSetting[0].image,
+    buttonsSetting[0].id,
+  );
   toolBarElement.appendChild(toolBarButtonElement1);
 
-  const toolBarButtonElement2 = await createToolBarButton("donuTool-button2", "64px", "131px", buttonsSetting[1].image, buttonsSetting[1].id);
+  const toolBarButtonElement2 = await createToolBarButton(
+    "donuTool-button2",
+    "64px",
+    "131px",
+    buttonsSetting[1].image,
+    buttonsSetting[1].id,
+  );
   toolBarElement.appendChild(toolBarButtonElement2);
 
-  const toolBarButtonElement3 = await createToolBarButton("donuTool-button3", "112px", "112px", buttonsSetting[2].image, buttonsSetting[2].id);
+  const toolBarButtonElement3 = await createToolBarButton(
+    "donuTool-button3",
+    "112px",
+    "112px",
+    buttonsSetting[2].image,
+    buttonsSetting[2].id,
+  );
   toolBarElement.appendChild(toolBarButtonElement3);
 
-  const toolBarButtonElement4 = await createToolBarButton("donuTool-button4", "131px", "64px", buttonsSetting[3].image, buttonsSetting[3].id);
+  const toolBarButtonElement4 = await createToolBarButton(
+    "donuTool-button4",
+    "131px",
+    "64px",
+    buttonsSetting[3].image,
+    buttonsSetting[3].id,
+  );
   toolBarElement.appendChild(toolBarButtonElement4);
 
-  const toolBarButtonElement5 = await createToolBarButton("donuTool-button5", "111px", "19px", buttonsSetting[4].image, buttonsSetting[4].id);
+  const toolBarButtonElement5 = await createToolBarButton(
+    "donuTool-button5",
+    "111px",
+    "19px",
+    buttonsSetting[4].image,
+    buttonsSetting[4].id,
+  );
   toolBarElement.appendChild(toolBarButtonElement5);
 
   return toolBarElement;
 }
 
 async function createToolBarButton(id, top, left, svgName, actionKey) {
-  const { buttonActions } = await import(chrome.runtime.getURL("overlay/buttonActions.js"));
+  const { buttonActions } = await import(
+    chrome.runtime.getURL("overlay/buttonActions.js")
+  );
   const onClick = buttonActions[actionKey];
 
   const button = document.createElement("div");
   button.id = id;
-  button.addEventListener("mouseup", onClick);
+  button.addEventListener("mouseup", (event) => {
+    if (typeof onClick === "function") {
+      onClick(event);
+    }
+    chrome.storage.local.get("buttonClickCounts", (data) => {
+      const storedCounts = data.buttonClickCounts || {};
+      storedCounts[actionKey] = (storedCounts[actionKey] || 0) + 1;
+      chrome.storage.local.set({ buttonClickCounts: storedCounts });
+
+      chrome.storage.local.get(["user"], (userData) => {
+        if (userData.user) {
+          const googleId = userData.user.googleId;
+          fetch(`http://localhost:3001/api/user/${googleId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ buttonClickCounts: storedCounts }),
+          }).catch((err) =>
+            console.error("Failed to update click count to server:", err),
+          );
+        }
+      });
+    });
+  });
   Object.assign(button.style, {
     position: "absolute",
     top: top,
@@ -86,13 +140,17 @@ async function createToolBarButton(id, top, left, svgName, actionKey) {
 
   button.addEventListener("mouseover", () => {
     button.style.backgroundColor = "darkgray";
-    button.style.transform = (button.style.transform || "").replace(/scale\([^)]*\)/g, "").trim() + " scale(1.2)";
+    button.style.transform =
+      (button.style.transform || "").replace(/scale\([^)]*\)/g, "").trim() +
+      " scale(1.2)";
     svgImg.style.filter = "brightness(2)";
   });
 
   button.addEventListener("mouseout", () => {
     button.style.backgroundColor = "lightgray";
-    button.style.transform = (button.style.transform || "").replace(/scale\([^)]*\)/g, "").trim() + " scale(1)";
+    button.style.transform =
+      (button.style.transform || "").replace(/scale\([^)]*\)/g, "").trim() +
+      " scale(1)";
     svgImg.style.filter = "none";
   });
 

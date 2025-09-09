@@ -1,5 +1,4 @@
-const CLIENT_ID =
-  "REMOVED";
+const CLIENT_ID = __GOOGLE_CLIENT_ID__;
 const REDIRECT_URI =
   typeof chrome !== "undefined" && chrome.runtime?.id
     ? `https://${chrome.runtime.id}.chromiumapp.org/`
@@ -29,8 +28,14 @@ export async function googleLogin(options = {}) {
 
         try {
           chrome.storage.local.get(
-            ["buttonsSetting", "isDarkMode", "addressOfNewTab"],
+            [
+              "buttonClickCounts",
+              "buttonsSetting",
+              "isDarkMode",
+              "addressOfNewTab",
+            ],
             async (result) => {
+              const initialButtonClickCounts = result.buttonClickCounts ?? {};
               const initialButtonsSetting = result.buttonsSetting || [];
               const initialIsDarkMode = result.isDarkMode ?? false;
               const initialAddressOfNewTab =
@@ -44,6 +49,7 @@ export async function googleLogin(options = {}) {
                   body: JSON.stringify({
                     code,
                     redirectUri: REDIRECT_URI,
+                    buttonClickCounts: initialButtonClickCounts,
                     buttonsSetting: initialButtonsSetting,
                     isDarkMode: initialIsDarkMode,
                     addressOfNewTab: initialAddressOfNewTab,
