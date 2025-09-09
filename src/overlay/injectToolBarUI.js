@@ -64,12 +64,6 @@
   let toolBarUI = await createToolBarElement();
   document.body.appendChild(toolBarUI);
 
-  const buttonsInToolBar = [];
-
-  for (let i = 1; i < 6; i++) {
-    buttonsInToolBar.push(document.getElementById(`donuTool-button${i}`));
-  }
-
   window.addEventListener("mousedown", () => {
     if (!isElementInteractive) {
       isMouseDown = true;
@@ -114,15 +108,27 @@
         window.innerHeight,
       );
 
-      buttonsInToolBar.forEach((button) => {
-        button.style.transform = getReverseRotationAngle(
-          e.clientX,
-          e.clientY,
-          window.innerWidth,
-          window.innerHeight,
-        );
-        button.style.transition =
-          "transform 0.3s ease, background-color 0.3s ease";
+      const buttonIds = [
+        "donuTool-button1",
+        "donuTool-button2",
+        "donuTool-button3",
+        "donuTool-button4",
+        "donuTool-button5",
+      ];
+
+      buttonIds.forEach((buttonId) => {
+        const button = document.getElementById(buttonId);
+        if (button && button.style) {
+          button.style.transform = getReverseRotationAngle(
+            e.clientX,
+            e.clientY,
+            window.innerWidth,
+            window.innerHeight,
+          );
+
+          button.style.transition =
+            "transform 0.3s ease, background-color 0.3s ease";
+        }
       });
     }
 
