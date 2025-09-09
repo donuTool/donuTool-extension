@@ -7,6 +7,7 @@ export default function LogOutButton() {
   const logOutWithGoogle = () => {
     chrome.storage?.local.remove(
       [
+        "buttonClickCounts",
         "buttonsSetting",
         "isDarkMode",
         "addressOfNewTab",
