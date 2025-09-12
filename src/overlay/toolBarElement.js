@@ -14,8 +14,8 @@ export async function createToolBarElement() {
   const toolBarImage = document.createElement("img");
   toolBarImage.src = chrome.runtime.getURL("assets/donuToolBar.png");
   Object.assign(toolBarImage.style, {
-    width: "180px",
-    height: "180px",
+    width: "120px",
+    height: "120px",
     filter: "brightness(1.15)",
     pointerEvents: "none",
     webkitUserDrag: "none",
@@ -32,8 +32,8 @@ export async function createToolBarElement() {
 
   const toolBarButtonElement1 = await createToolBarButton(
     "donuTool-button1",
-    "18px",
-    "112px",
+    "12px",
+    "75px",
     buttonsSetting[0].image,
     buttonsSetting[0].id,
   );
@@ -41,8 +41,8 @@ export async function createToolBarElement() {
 
   const toolBarButtonElement2 = await createToolBarButton(
     "donuTool-button2",
-    "64px",
-    "131px",
+    "43px",
+    "87px",
     buttonsSetting[1].image,
     buttonsSetting[1].id,
   );
@@ -50,8 +50,8 @@ export async function createToolBarElement() {
 
   const toolBarButtonElement3 = await createToolBarButton(
     "donuTool-button3",
-    "112px",
-    "112px",
+    "75px",
+    "75px",
     buttonsSetting[2].image,
     buttonsSetting[2].id,
   );
@@ -59,8 +59,8 @@ export async function createToolBarElement() {
 
   const toolBarButtonElement4 = await createToolBarButton(
     "donuTool-button4",
-    "131px",
-    "64px",
+    "87px",
+    "43px",
     buttonsSetting[3].image,
     buttonsSetting[3].id,
   );
@@ -68,8 +68,8 @@ export async function createToolBarElement() {
 
   const toolBarButtonElement5 = await createToolBarButton(
     "donuTool-button5",
-    "111px",
-    "19px",
+    "74px",
+    "13px",
     buttonsSetting[4].image,
     buttonsSetting[4].id,
   );
@@ -114,12 +114,12 @@ async function createToolBarButton(id, top, left, svgName, actionKey) {
     top: top,
     left: left,
     display: "flex",
-    width: "40px",
-    height: "40px",
+    width: "27px",
+    height: "27px",
     borderRadius: "50%",
     justifyContent: "center",
     alignItems: "center",
-    fontSize: "10px",
+    fontSize: "7px",
     backgroundColor: "lightgray",
     cursor: "grabbing",
     transform: "scale(1)",
@@ -129,8 +129,8 @@ async function createToolBarButton(id, top, left, svgName, actionKey) {
   const svgImg = document.createElement("img");
   svgImg.src = chrome.runtime.getURL(`assets/${svgName}.svg`);
   Object.assign(svgImg.style, {
-    width: "25px",
-    height: "25px",
+    width: "17px",
+    height: "17px",
     display: "block",
     pointerEvents: "none",
     transition: "filter 0.3s ease",
