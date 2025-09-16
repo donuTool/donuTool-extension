@@ -30,50 +30,27 @@ export async function createToolBarElement() {
     });
   });
 
-  const toolBarButtonElement1 = await createToolBarButton(
-    "donuTool-button1",
-    "12px",
-    "75px",
-    buttonsSetting[0].image,
-    buttonsSetting[0].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement1);
+  const BUTTON_POSITIONS = [
+    { id: "donuTool-button1", top: "12px", left: "75px" },
+    { id: "donuTool-button2", top: "43px", left: "87px" },
+    { id: "donuTool-button3", top: "75px", left: "75px" },
+    { id: "donuTool-button4", top: "87px", left: "43px" },
+    { id: "donuTool-button5", top: "74px", left: "13px" },
+  ];
 
-  const toolBarButtonElement2 = await createToolBarButton(
-    "donuTool-button2",
-    "43px",
-    "87px",
-    buttonsSetting[1].image,
-    buttonsSetting[1].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement2);
+  for (let i = 0; i < Math.min(buttonsSetting.length, 5); i++) {
+    const buttonConfig = BUTTON_POSITIONS[i];
+    const buttonSetting = buttonsSetting[i];
 
-  const toolBarButtonElement3 = await createToolBarButton(
-    "donuTool-button3",
-    "75px",
-    "75px",
-    buttonsSetting[2].image,
-    buttonsSetting[2].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement3);
-
-  const toolBarButtonElement4 = await createToolBarButton(
-    "donuTool-button4",
-    "87px",
-    "43px",
-    buttonsSetting[3].image,
-    buttonsSetting[3].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement4);
-
-  const toolBarButtonElement5 = await createToolBarButton(
-    "donuTool-button5",
-    "74px",
-    "13px",
-    buttonsSetting[4].image,
-    buttonsSetting[4].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement5);
+    const buttonElement = await createToolBarButton(
+      buttonConfig.id,
+      buttonConfig.top,
+      buttonConfig.left,
+      buttonSetting.image,
+      buttonSetting.id,
+    );
+    toolBarElement.appendChild(buttonElement);
+  }
 
   return toolBarElement;
 }
