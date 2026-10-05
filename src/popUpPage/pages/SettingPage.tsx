@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import type { Button } from "@/stores/types";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useButtonStore } from "@/stores/useButtonStore";
 import { useAddressStore } from "@/stores/useAddressStore";
@@ -15,38 +16,50 @@ export default function SettingPage() {
   const { buttons, setButtons } = useButtonStore();
   const { address, setAddress } = useAddressStore();
 
+  // 마운트 시에는 불러오기만 하고, 저장(storage + 서버)은 사용자가 변경했을 때만 한다
   useEffect(() => {
+    chrome.storage?.local.get(
+      ["buttonsSetting", "addressOfNewTab"],
+      ({ buttonsSetting, addressOfNewTab }) => {
+        if (buttonsSetting?.length) setButtons(buttonsSetting);
+        if (addressOfNewTab) setAddress(addressOfNewTab);
+      },
+    );
+
     fetchUser()
       .then((serverUser) => {
-        if (serverUser?.buttonsSetting?.length) {
+        if (!serverUser) return;
+
+        const fromServer: {
+          buttonsSetting?: Button[];
+          addressOfNewTab?: string;
+        } = {};
+        if (serverUser.buttonsSetting?.length) {
+          fromServer.buttonsSetting = serverUser.buttonsSetting;
           setButtons(serverUser.buttonsSetting);
-          chrome.storage?.local.set({
-            buttonsSetting: serverUser.buttonsSetting,
-          });
         }
+        if (serverUser.addressOfNewTab) {
+          fromServer.addressOfNewTab = serverUser.addressOfNewTab;
+          setAddress(serverUser.addressOfNewTab);
+        }
+        chrome.storage?.local.set(fromServer);
       })
       .catch((err) =>
-        console.error("Failed to fetch buttonsSetting from server:", err),
+        console.error("Failed to fetch settings from server:", err),
       );
+  }, [setButtons, setAddress]);
 
-    chrome.storage?.local.get("addressOfNewTab", (data) => {
-      if (data.addressOfNewTab) {
-        setAddress(data.addressOfNewTab);
-      }
-    });
-  }, []);
+  const saveButtons = (newButtons: Button[]) => {
+    setButtons(newButtons);
+    chrome.storage?.local.set({ buttonsSetting: newButtons });
+    syncUserSettings({ buttonsSetting: newButtons });
+  };
 
-  useEffect(() => {
-    syncUserSettings({ buttonsSetting: buttons });
-
-    chrome.storage?.local.set({ buttonsSetting: buttons });
-  }, [buttons]);
-
-  useEffect(() => {
-    syncUserSettings({ addressOfNewTab: address });
-
-    chrome.storage?.local.set({ addressOfNewTab: address });
-  }, [address]);
+  const saveAddress = (newAddress: string) => {
+    setAddress(newAddress);
+    chrome.storage?.local.set({ addressOfNewTab: newAddress });
+    syncUserSettings({ addressOfNewTab: newAddress });
+  };
 
   const setAddressOfNewTab = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -84,8 +97,7 @@ export default function SettingPage() {
       if (!/^https?:\/\//.test(addressValue)) {
         addressValue = "https://" + addressValue;
       }
-      chrome.storage.local.set({ addressOfNewTab: addressValue });
-      setAddress(addressValue);
+      saveAddress(addressValue);
     }
   };
 
@@ -96,24 +108,25 @@ export default function SettingPage() {
     const activeId = String(active.id);
     const overId = String(over.id);
 
-    setButtons((prev) => {
-      const activeIndex = prev.findIndex((btn) => btn.id === activeId);
-      const overIndex = prev.findIndex((btn) => btn.id === overId);
+    const activeIndex = buttons.findIndex((btn) => btn.id === activeId);
+    const overIndex = buttons.findIndex((btn) => btn.id === overId);
+    if (activeIndex < 0 || overIndex < 0) return;
 
-      if (activeIndex < 0 || overIndex < 0) return prev;
+    const activeButton = buttons[activeIndex];
+    const overButton = buttons[overIndex];
+    const newButtons = [...buttons];
+    newButtons[activeIndex] = {
+      ...activeButton,
+      id: overButton.id,
+      image: overButton.image,
+    };
+    newButtons[overIndex] = {
+      ...overButton,
+      id: activeButton.id,
+      image: activeButton.image,
+    };
 
-      const newButtons = [...prev];
-      const temp = {
-        id: newButtons[activeIndex].id,
-        image: newButtons[activeIndex].image,
-      };
-      newButtons[activeIndex].id = newButtons[overIndex].id;
-      newButtons[activeIndex].image = newButtons[overIndex].image;
-      newButtons[overIndex].id = temp.id;
-      newButtons[overIndex].image = temp.image;
-
-      return newButtons;
-    });
+    saveButtons(newButtons);
   };
 
   return (
