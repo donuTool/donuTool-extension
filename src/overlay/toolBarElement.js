@@ -94,18 +94,9 @@ async function createToolBarButton(id, top, left, svgName, actionKey) {
       const storedCounts = data.buttonClickCounts || {};
       storedCounts[actionKey] = (storedCounts[actionKey] || 0) + 1;
       chrome.storage.local.set({ buttonClickCounts: storedCounts });
-
-      chrome.storage.local.get(["user"], (userData) => {
-        if (userData.user) {
-          const googleId = userData.user.googleId;
-          fetch(`http://localhost:3001/api/user/${googleId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ buttonClickCounts: storedCounts }),
-          }).catch((err) =>
-            console.error("Failed to update click count to server:", err),
-          );
-        }
+      chrome.runtime.sendMessage({
+        action: "syncUserSettings",
+        settings: { buttonClickCounts: storedCounts },
       });
     });
   });

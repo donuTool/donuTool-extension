@@ -4,6 +4,7 @@ import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useButtonStore } from "@/stores/useButtonStore";
 import { useAddressStore } from "@/stores/useAddressStore";
+import { fetchUser, syncUserSettings } from "@/popUpPage/utils/userApi";
 import GoBackButton from "@/popUpPage/components/buttons/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
@@ -15,24 +16,18 @@ export default function SettingPage() {
   const { address, setAddress } = useAddressStore();
 
   useEffect(() => {
-    chrome.storage?.local.get(["user"], (data) => {
-      if (data.user) {
-        const googleId = data.user.googleId;
-        fetch(`http://localhost:3001/api/user/${googleId}`)
-          .then((res) => res.json())
-          .then((serverUser) => {
-            if (serverUser?.buttonsSetting) {
-              setButtons(serverUser.buttonsSetting);
-              chrome.storage?.local.set({
-                buttonsSetting: serverUser.buttonsSetting,
-              });
-            }
-          })
-          .catch((err) =>
-            console.error("Failed to fetch buttonsSetting from server:", err),
-          );
-      }
-    });
+    fetchUser()
+      .then((serverUser) => {
+        if (serverUser?.buttonsSetting) {
+          setButtons(serverUser.buttonsSetting);
+          chrome.storage?.local.set({
+            buttonsSetting: serverUser.buttonsSetting,
+          });
+        }
+      })
+      .catch((err) =>
+        console.error("Failed to fetch buttonsSetting from server:", err),
+      );
 
     chrome.storage?.local.get("addressOfNewTab", (data) => {
       if (data.addressOfNewTab) {
@@ -42,19 +37,7 @@ export default function SettingPage() {
   }, []);
 
   useEffect(() => {
-    chrome.storage?.local.get(["user"], (data) => {
-      if (data.user) {
-        const googleId = data.user.googleId;
-
-        fetch(`http://localhost:3001/api/user/${googleId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ buttonsSetting: buttons }),
-        }).catch((err) =>
-          console.error("Failed to update buttonsSetting to server:", err),
-        );
-      }
-    });
+    syncUserSettings({ buttonsSetting: buttons });
 
     chrome.storage?.local.set({ buttonsSetting: buttons }, () => {
       chrome.tabs.query({}, (tabs) => {
@@ -68,19 +51,7 @@ export default function SettingPage() {
   }, [buttons]);
 
   useEffect(() => {
-    chrome.storage?.local.get(["user"], (data) => {
-      if (data.user) {
-        const googleId = data.user.googleId;
-
-        fetch(`http://localhost:3001/api/user/${googleId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ addressOfNewTab: address }),
-        }).catch((err) =>
-          console.error("Failed to update addressOfNewTab to server:", err),
-        );
-      }
-    });
+    syncUserSettings({ addressOfNewTab: address });
 
     chrome.storage?.local.set({ addressOfNewTab: address });
   }, [address]);

@@ -49,6 +49,10 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       __GOOGLE_CLIENT_ID__: JSON.stringify(env.GOOGLE_CLIENT_ID),
+      __API_URL__: JSON.stringify(env.API_URL || "http://localhost:3001"),
+      __DASHBOARD_URL__: JSON.stringify(
+        env.DASHBOARD_URL || "http://localhost:5173",
+      ),
     },
   };
 });

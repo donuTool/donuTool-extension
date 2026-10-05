@@ -1,3 +1,5 @@
+import { API_URL } from "../config.js";
+
 let isCapturing = false;
 
 const messageHandlers = {
@@ -11,6 +13,36 @@ const messageHandlers = {
   downloadImagesFromCurrentPage: handleImageDownload,
   captureVisibleTab: handleCaptureTab,
 };
+
+const asyncMessageHandlers = {
+  fetchUser: () => apiRequest("/api/user/me"),
+  syncUserSettings: (message) =>
+    apiRequest("/api/user/me", { method: "PUT", body: message.settings }),
+};
+
+async function apiRequest(path, { method = "GET", body } = {}) {
+  const { jwt } = await chrome.storage.local.get("jwt");
+  if (!jwt) return null;
+
+  const res = await fetch(`${API_URL}${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      ...(body && { "Content-Type": "application/json" }),
+    },
+    body: body && JSON.stringify(body),
+  });
+
+  if (res.status === 401) {
+    await chrome.storage.local.remove(["jwt", "user"]);
+    return null;
+  }
+  if (!res.ok) {
+    throw new Error(`API request failed: ${res.status}`);
+  }
+
+  return res.json();
+}
 
 function handleTabSwitch(message) {
   chrome.tabs.query({ currentWindow: true }, (tabs) => {
@@ -217,9 +249,23 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  const handler = messageHandlers[message.action];
-  if (handler) {
-    handler(message, sender, sendResponse);
+  const asyncHandler = asyncMessageHandlers[message.action];
+  if (asyncHandler) {
+    asyncHandler(message)
+      .then((data) => sendResponse({ data }))
+      .catch((error) => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  messageHandlers[message.action]?.(message, sender);
+});
+
+// 대시보드 웹(manifest의 externally_connectable에 등록된 origin)만 호출 가능
+chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
+  if (message?.action === "getSession") {
+    chrome.storage.local.get("jwt", ({ jwt }) => {
+      sendResponse({ token: jwt ?? null });
+    });
     return true;
   }
 });

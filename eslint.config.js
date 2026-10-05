@@ -15,6 +15,9 @@ export default defineConfig([
     languageOptions: {
       globals: {
         ...globals.browser,
+        __GOOGLE_CLIENT_ID__: "readonly",
+        __API_URL__: "readonly",
+        __DASHBOARD_URL__: "readonly",
         chrome: "readonly",
       },
     },

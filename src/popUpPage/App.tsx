@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useButtonStore } from "@/stores/useButtonStore";
+import { fetchUser } from "@/popUpPage/utils/userApi";
 import Background from "@/popUpPage/components/Background";
 import LogInPage from "@/popUpPage/pages/LogInPage";
 import MainPage from "@/popUpPage/pages/MainPage";
@@ -20,24 +21,20 @@ function App() {
       if (result.buttonsSetting && result.buttonsSetting.length > 0) {
         setButtons(result.buttonsSetting);
       } else {
-        chrome.storage?.local.get(["user"], (data) => {
-          if (data.user) {
-            fetch(`http://localhost:3001/api/user/${data.user.googleId}`)
-              .then((res) => res.json())
-              .then((serverUser) => {
-                if (serverUser?.buttonsSetting?.length > 0) {
-                  setButtons(serverUser.buttonsSetting);
-                  chrome.storage?.local.set({
-                    buttonsSetting: serverUser.buttonsSetting,
-                  });
-                } else {
-                  chrome.storage?.local.set({ buttonsSetting: buttons });
-                }
-              });
-          } else {
+        fetchUser()
+          .then((serverUser) => {
+            const serverButtons = serverUser?.buttonsSetting;
+            if (serverButtons && serverButtons.length > 0) {
+              setButtons(serverButtons);
+              chrome.storage?.local.set({ buttonsSetting: serverButtons });
+            } else {
+              chrome.storage?.local.set({ buttonsSetting: buttons });
+            }
+          })
+          .catch((err) => {
+            console.error("Failed to fetch user from server:", err);
             chrome.storage?.local.set({ buttonsSetting: buttons });
-          }
-        });
+          });
       }
     });
   }, []);
