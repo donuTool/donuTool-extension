@@ -18,7 +18,7 @@ export default function SettingPage() {
   useEffect(() => {
     fetchUser()
       .then((serverUser) => {
-        if (serverUser?.buttonsSetting) {
+        if (serverUser?.buttonsSetting?.length) {
           setButtons(serverUser.buttonsSetting);
           chrome.storage?.local.set({
             buttonsSetting: serverUser.buttonsSetting,

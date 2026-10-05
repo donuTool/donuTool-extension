@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
             dest: "background",
           },
           {
-            src: "src/overlay/*",
+            src: "src/overlay/*.js",
             dest: "overlay",
           },
           {

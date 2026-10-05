@@ -1,3 +1,11 @@
+const TOOLBAR_BUTTON_POSITIONS = [
+  ["18px", "112px"],
+  ["64px", "131px"],
+  ["112px", "112px"],
+  ["131px", "64px"],
+  ["111px", "19px"],
+];
+
 export async function createToolBarElement() {
   const toolBarElement = document.createElement("div");
   toolBarElement.id = "donuTool-toolBar";
@@ -23,57 +31,28 @@ export async function createToolBarElement() {
   });
   toolBarElement.appendChild(toolBarImage);
 
+  const { withDefaultButtons } = await import(
+    chrome.runtime.getURL("overlay/defaultButtons.js")
+  );
   const buttonsSetting = await new Promise((resolve) => {
     chrome.storage.local.get("buttonsSetting", (data) => {
-      const allSettings = data.buttonsSetting || [];
-      resolve(allSettings.slice(0, 5));
+      resolve(withDefaultButtons(data.buttonsSetting).slice(0, 5));
     });
   });
 
-  const toolBarButtonElement1 = await createToolBarButton(
-    "donuTool-button1",
-    "18px",
-    "112px",
-    buttonsSetting[0].image,
-    buttonsSetting[0].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement1);
+  for (const [index, [top, left]] of TOOLBAR_BUTTON_POSITIONS.entries()) {
+    const setting = buttonsSetting[index];
+    if (!setting) continue;
 
-  const toolBarButtonElement2 = await createToolBarButton(
-    "donuTool-button2",
-    "64px",
-    "131px",
-    buttonsSetting[1].image,
-    buttonsSetting[1].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement2);
-
-  const toolBarButtonElement3 = await createToolBarButton(
-    "donuTool-button3",
-    "112px",
-    "112px",
-    buttonsSetting[2].image,
-    buttonsSetting[2].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement3);
-
-  const toolBarButtonElement4 = await createToolBarButton(
-    "donuTool-button4",
-    "131px",
-    "64px",
-    buttonsSetting[3].image,
-    buttonsSetting[3].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement4);
-
-  const toolBarButtonElement5 = await createToolBarButton(
-    "donuTool-button5",
-    "111px",
-    "19px",
-    buttonsSetting[4].image,
-    buttonsSetting[4].id,
-  );
-  toolBarElement.appendChild(toolBarButtonElement5);
+    const toolBarButtonElement = await createToolBarButton(
+      `donuTool-button${index + 1}`,
+      top,
+      left,
+      setting.image,
+      setting.id,
+    );
+    toolBarElement.appendChild(toolBarButtonElement);
+  }
 
   return toolBarElement;
 }

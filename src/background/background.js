@@ -1,4 +1,5 @@
 import { API_URL } from "../config.js";
+import { withDefaultButtons } from "../overlay/defaultButtons.js";
 
 let isCapturing = false;
 
@@ -230,6 +231,14 @@ function handleCaptureTab() {
     );
   });
 }
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.get("buttonsSetting", ({ buttonsSetting }) => {
+    chrome.storage.local.set({
+      buttonsSetting: withDefaultButtons(buttonsSetting),
+    });
+  });
+});
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (
