@@ -1,6 +1,7 @@
 import { withDefaultButtons } from "@/shared/defaultButtons";
 import { buttonActions } from "./buttonActions.js";
 import { alertMessages } from "./alertMessages.js";
+import { t } from "@/shared/messages";
 import { createToolbarUI } from "./toolbarUI.js";
 import {
   getRotationDegree,
@@ -92,7 +93,7 @@ function init() {
       event.preventDefault();
       chrome.storage.local.get("donuToolActive", ({ donuToolActive }) => {
         chrome.storage.local.set({ donuToolActive: !donuToolActive });
-        ui.showAlert(donuToolActive ? "툴바 일시 비활성화됨" : "툴바 활성화됨");
+        ui.showAlert(t(donuToolActive ? "toolbarDisabled" : "toolbarEnabled"));
       });
     },
     { signal: lifetime.signal },

@@ -1,4 +1,5 @@
 import { withDefaultButtons } from "@/shared/defaultButtons";
+import { t, uiLanguage } from "@/shared/messages";
 
 const API_URL = __API_URL__;
 const CONTENT_SCRIPT = "content/content.js";
@@ -13,7 +14,7 @@ const tabMessageHandlers = {
   closeCurrentTab: (tab) => chrome.tabs.remove(tab.id),
   bookmarkCurrentTab: handleBookmarkTab,
   openTranslatedPage: handleTranslate,
-  downloadImagesFromCurrentPage: handleImageDownload,
+  downloadImages: handleImageDownload,
   captureVisibleTab: handleCaptureTab,
 };
 
@@ -64,7 +65,7 @@ async function handleNewTab(tab) {
 }
 
 async function handleBookmarkTab(tab) {
-  const FOLDER_TITLE = "donuTool 북마크 폴더";
+  const FOLDER_TITLE = t("bookmarkFolder");
   const results = await chrome.bookmarks.search({ title: FOLDER_TITLE });
   let folder = results.find(
     (bookmarkNode) => bookmarkNode.title === FOLDER_TITLE && !bookmarkNode.url,
@@ -85,38 +86,35 @@ async function handleBookmarkTab(tab) {
 }
 
 function handleTranslate(tab) {
-  const translatedUrl = `https://translate.google.com/translate?sl=auto&tl=ko&u=${encodeURIComponent(tab.url)}`;
+  // 브라우저 언어로 번역 (zh-CN/zh-TW는 지역 코드까지 필요)
+  const targetLanguage = uiLanguage.startsWith("zh")
+    ? uiLanguage
+    : uiLanguage.split("-")[0];
+  const translatedUrl = `https://translate.google.com/translate?sl=auto&tl=${targetLanguage}&u=${encodeURIComponent(tab.url)}`;
   chrome.tabs.create({ url: translatedUrl, index: tab.index + 1 });
 }
 
-async function handleImageDownload(tab) {
+const IMAGE_EXTENSION = /\.(jpe?g|png|gif|webp|avif|svg|bmp|ico)$/i;
+
+function getImageExtension(url) {
+  const match = new URL(url).pathname.match(IMAGE_EXTENSION);
+  return match ? match[0].toLowerCase() : ".jpg";
+}
+
+function handleImageDownload(tab, message) {
   const noSpaceTitle = tab.title.replace(/\s+/g, "");
   const trimmedTitle =
     noSpaceTitle.length > 15 ? `${noSpaceTitle.slice(0, 15)}...` : noSpaceTitle;
   const safeTitle = trimmedTitle.replace(/[^\p{L}\p{N}_\-()[\]]/gu, "_");
 
-  const [injectionResult] = await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    func: () =>
-      Array.from(document.querySelectorAll("img"))
-        .map((img) => img.src)
-        .filter((src) => src && !src.startsWith("data:")),
-  });
-
-  const urls = injectionResult?.result;
-  if (!urls || urls.length === 0) {
-    chrome.tabs.sendMessage(tab.id, { action: "noImagesAvailable" });
-    return;
-  }
-
+  const urls = message.urls.filter((url) => /^https?:\/\//.test(url));
   urls.forEach((url, index) => {
     chrome.downloads.download({
       url,
-      filename: `${safeTitle}/image-${index + 1}.jpg`,
+      filename: `${safeTitle}/image-${index + 1}${getImageExtension(url)}`,
       saveAs: false,
     });
   });
-  chrome.tabs.sendMessage(tab.id, { action: "imagesDownloadSuccess" });
 }
 
 async function handleCaptureTab(tab) {
