@@ -7,7 +7,7 @@ import { BsPersonCircle } from "react-icons/bs";
 import { useButtonStore } from "@/stores/useButtonStore";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useAddressStore } from "@/stores/useAddressStore";
-import { withDefaultButtons } from "@/overlay/defaultButtons.js";
+import { withDefaultButtons } from "@/shared/defaultButtons";
 import Title from "@/popUpPage/components/Title";
 import LoginButton from "@/popUpPage/components/buttons/LogInButton";
 

@@ -19,14 +19,6 @@ export default defineConfig(({ mode }) => {
       viteStaticCopy({
         targets: [
           {
-            src: "src/background/*",
-            dest: "background",
-          },
-          {
-            src: "src/overlay/*.js",
-            dest: "overlay",
-          },
-          {
             src: "src/assets/*",
             dest: "assets",
           },

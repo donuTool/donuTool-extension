@@ -4,12 +4,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const API_URL = process.env.API_URL || "http://localhost:3001";
 const DASHBOARD_URL = process.env.DASHBOARD_URL || "http://localhost:5173";
 
 const manifestPath = path.resolve("./public/manifest.json");
 const distManifestPath = path.resolve("./dist/manifest.json");
-const distConfigPath = path.resolve("./dist/config.js");
 
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
 
@@ -21,10 +19,3 @@ manifest.externally_connectable = {
 };
 
 fs.writeFileSync(distManifestPath, JSON.stringify(manifest, null, 2));
-
-// background service worker는 vite 번들링을 거치지 않으므로 설정을 별도 모듈로 주입
-fs.writeFileSync(
-  distConfigPath,
-  `export const API_URL = ${JSON.stringify(API_URL)};\n` +
-    `export const DASHBOARD_URL = ${JSON.stringify(DASHBOARD_URL)};\n`,
-);

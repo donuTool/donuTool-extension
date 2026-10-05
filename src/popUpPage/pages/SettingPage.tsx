@@ -39,15 +39,7 @@ export default function SettingPage() {
   useEffect(() => {
     syncUserSettings({ buttonsSetting: buttons });
 
-    chrome.storage?.local.set({ buttonsSetting: buttons }, () => {
-      chrome.tabs.query({}, (tabs) => {
-        tabs.forEach((tab) => {
-          if (tab.id !== undefined) {
-            chrome.tabs.sendMessage(tab.id, { action: "updateToolBar" });
-          }
-        });
-      });
-    });
+    chrome.storage?.local.set({ buttonsSetting: buttons });
   }, [buttons]);
 
   useEffect(() => {

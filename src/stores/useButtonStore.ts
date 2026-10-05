@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { Button } from "@/stores/types";
-import { withDefaultButtons } from "@/overlay/defaultButtons.js";
+import { withDefaultButtons } from "@/shared/defaultButtons";
 
 interface ButtonStore {
   buttons: Button[];

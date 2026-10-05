@@ -20,10 +20,17 @@
     "service_worker": "background/background.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "web_accessible_resources": [
     {
-      "resources": ["assets/donuToolBar.png", "assets/*.svg", "overlay/*.js"],
-      "matches": ["<all_urls>"]
+      "resources": ["assets/donuToolBar.png", "assets/*.svg"],
+      "matches": ["http://*/*", "https://*/*"]
     }
   ],
   "permissions": [

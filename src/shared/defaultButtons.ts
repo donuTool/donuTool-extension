@@ -1,5 +1,7 @@
-// 팝업(useButtonStore), background, content script가 함께 쓰는 기본 버튼 설정
-export const DEFAULT_BUTTONS = [
+import type { Button } from "@/stores/types";
+
+// 팝업, background, content script가 함께 쓰는 기본 버튼 설정
+export const DEFAULT_BUTTONS: Button[] = [
   { id: "goBack", image: "arrow-left", status: "IN_TOOLBAR", top: 15, left: 93.3 },
   { id: "goForward", image: "arrow-right", status: "IN_TOOLBAR", top: 53.3, left: 109.2 },
   { id: "newTab", image: "new", status: "IN_TOOLBAR", top: 93.3, left: 93.3 },
@@ -16,7 +18,7 @@ export const DEFAULT_BUTTONS = [
   { id: "capture", image: "camera", status: "IN_LIST" },
 ];
 
-export function withDefaultButtons(buttonsSetting) {
+export function withDefaultButtons(buttonsSetting?: Button[] | null): Button[] {
   return Array.isArray(buttonsSetting) && buttonsSetting.length > 0
     ? buttonsSetting
     : DEFAULT_BUTTONS.map((button) => ({ ...button }));

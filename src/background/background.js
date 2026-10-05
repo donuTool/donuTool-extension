@@ -1,15 +1,17 @@
-import { API_URL } from "../config.js";
-import { withDefaultButtons } from "../overlay/defaultButtons.js";
+import { withDefaultButtons } from "@/shared/defaultButtons";
+
+const API_URL = __API_URL__;
+const CONTENT_SCRIPT = "content/content.js";
 
 let isCapturing = false;
 
-const messageHandlers = {
-  goToNextTab: handleTabSwitch,
-  goToPreviousTab: handleTabSwitch,
-  closeCurrentTab: handleCloseTab,
+// 툴바(content script)에서 보낸 메시지는 sender.tab 기준으로 처리한다
+const tabMessageHandlers = {
+  goToNextTab: (tab) => switchTab(tab, 1),
+  goToPreviousTab: (tab) => switchTab(tab, -1),
+  openNewTab: handleNewTab,
+  closeCurrentTab: (tab) => chrome.tabs.remove(tab.id),
   bookmarkCurrentTab: handleBookmarkTab,
-  copyCurrentTabAddress: handleCopyAddress,
-  printCurrentPage: handlePrint,
   openTranslatedPage: handleTranslate,
   downloadImagesFromCurrentPage: handleImageDownload,
   captureVisibleTab: handleCaptureTab,
@@ -45,216 +47,115 @@ async function apiRequest(path, { method = "GET", body } = {}) {
   return res.json();
 }
 
-function handleTabSwitch(message) {
-  chrome.tabs.query({ currentWindow: true }, (tabs) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (activeTabs) => {
-      const currentIndex = activeTabs[0].index;
-      const newIndex =
-        message.action === "goToNextTab"
-          ? (currentIndex + 1) % tabs.length
-          : (currentIndex - 1 + tabs.length) % tabs.length;
-      chrome.tabs.update(tabs[newIndex].id, { active: true });
-    });
+async function switchTab(currentTab, step) {
+  const tabs = await chrome.tabs.query({ windowId: currentTab.windowId });
+  const nextIndex = (currentTab.index + step + tabs.length) % tabs.length;
+  const nextTab = tabs.find((tab) => tab.index === nextIndex);
+  if (nextTab) chrome.tabs.update(nextTab.id, { active: true });
+}
+
+async function handleNewTab(tab) {
+  const { addressOfNewTab } = await chrome.storage.local.get("addressOfNewTab");
+  chrome.tabs.create({
+    url: addressOfNewTab || "https://www.google.com",
+    index: tab.index + 1,
+    windowId: tab.windowId,
   });
 }
 
-function handleCloseTab() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0]?.id) {
-      chrome.tabs.remove(tabs[0].id);
-    }
-  });
-}
-
-function handleBookmarkTab() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tab = tabs[0];
-    const FOLDER_TITLE = "donuTool 북마크 폴더";
-    chrome.bookmarks.search({ title: FOLDER_TITLE }, (results) => {
-      const folder = results.find(
-        (bookmarkNode) =>
-          bookmarkNode.title === FOLDER_TITLE && !bookmarkNode.url,
-      );
-      const parentId = folder?.id;
-      const createBookmark = (parentId) => {
-        chrome.bookmarks.create({
-          parentId,
-          title: tab.title,
-          url: tab.url,
-        });
-        chrome.tabs.sendMessage(tab.id, {
-          action: "showBookmarkAlert",
-          title: tab.title,
-        });
-      };
-      if (parentId) {
-        createBookmark(parentId);
-      } else {
-        chrome.bookmarks.create({ title: FOLDER_TITLE }, (newFolder) => {
-          createBookmark(newFolder.id);
-        });
-      }
-    });
-  });
-}
-
-function handleCopyAddress() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const url = tabs[0]?.url;
-    const tab = tabs[0];
-    if (url) {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        func: (url) => {
-          navigator.clipboard.writeText(url);
-        },
-        args: [url],
-      });
-      chrome.tabs.sendMessage(tab.id, {
-        action: "showClipboardCopyAlert",
-        title: tab.title,
-      });
-    }
-  });
-}
-
-function handlePrint() {
-  if (isCapturing) return;
-  isCapturing = true;
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tabId = tabs[0].id;
-    chrome.scripting.executeScript(
-      {
-        target: { tabId },
-        func: () => {
-          const toolbar = document.getElementById("donuTool-toolBar");
-          if (toolbar) toolbar.style.opacity = "0";
-          const restoreOpacity = () => {
-            const toolbar = document.getElementById("donuTool-toolBar");
-            if (toolbar) toolbar.style.opacity = "";
-            window.removeEventListener("afterprint", restoreOpacity);
-          };
-          window.addEventListener("afterprint", restoreOpacity);
-          window.print();
-        },
-      },
-      () => {
-        isCapturing = false;
-      },
-    );
-  });
-}
-
-function handleTranslate() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const originalUrl = tabs[0].url;
-    const translatedUrl = `https://translate.google.com/translate?sl=auto&tl=ko&u=${encodeURIComponent(originalUrl)}`;
-    chrome.tabs.create({ url: translatedUrl });
-  });
-}
-
-function handleImageDownload() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tab = tabs[0];
-    const tabId = tab.id;
-    const noSpaceTitle = tab.title.replace(/\s+/g, "");
-    const trimmedTitle =
-      noSpaceTitle.length > 15
-        ? `${noSpaceTitle.slice(0, 15)}...`
-        : noSpaceTitle;
-    const safeTitle = trimmedTitle.replace(/[^\p{L}\p{N}_\-()\[\]]/gu, "_");
-    chrome.scripting.executeScript(
-      {
-        target: { tabId },
-        func: () => {
-          const imageUrls = Array.from(document.querySelectorAll("img"))
-            .map((img) => img.src)
-            .filter((src) => src && !src.startsWith("data:"));
-          return imageUrls;
-        },
-      },
-      (injectionResults) => {
-        const urls = injectionResults[0].result;
-        if (!urls || urls.length === 0) {
-          chrome.tabs.sendMessage(tab.id, {
-            action: "noImagesAvailable",
-          });
-          return;
-        }
-        urls.forEach((url, index) => {
-          chrome.downloads.download({
-            url,
-            filename: `${safeTitle}/image-${index + 1}.jpg`,
-            saveAs: false,
-          });
-        });
-        chrome.tabs.sendMessage(tab.id, {
-          action: "imagesDownloadSuccess",
-        });
-      },
-    );
-  });
-}
-
-function handleCaptureTab() {
-  if (isCapturing) return;
-  isCapturing = true;
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tabId = tabs[0].id;
-    chrome.scripting.executeScript(
-      {
-        target: { tabId },
-        func: () => {
-          const toolbar = document.getElementById("donuTool-toolBar");
-          if (toolbar) toolbar.style.opacity = "0";
-        },
-      },
-      () => {
-        setTimeout(() => {
-          chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
-            chrome.scripting.executeScript({
-              target: { tabId },
-              func: () => {
-                const toolbar = document.getElementById("donuTool-toolBar");
-                if (toolbar) toolbar.style.opacity = "";
-              },
-            });
-            chrome.tabs.sendMessage(tabId, {
-              action: "downloadCapturedImage",
-              dataUrl,
-              title: tabs[0].title,
-            });
-            isCapturing = false;
-          });
-        }, 100);
-      },
-    );
-  });
-}
-
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.get("buttonsSetting", ({ buttonsSetting }) => {
-    chrome.storage.local.set({
-      buttonsSetting: withDefaultButtons(buttonsSetting),
-    });
-  });
-});
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (
-    changeInfo.status === "complete" &&
-    tab.url &&
-    (tab.url.startsWith("http://") || tab.url.startsWith("https://"))
-  ) {
-    chrome.storage.local.get("donuToolActive", (data) => {
-      if (data.donuToolActive) {
-        chrome.scripting.executeScript({
-          target: { tabId },
-          files: ["overlay/injectToolBarUI.js"],
-        });
-      }
-    });
+async function handleBookmarkTab(tab) {
+  const FOLDER_TITLE = "donuTool 북마크 폴더";
+  const results = await chrome.bookmarks.search({ title: FOLDER_TITLE });
+  let folder = results.find(
+    (bookmarkNode) => bookmarkNode.title === FOLDER_TITLE && !bookmarkNode.url,
+  );
+  if (!folder) {
+    folder = await chrome.bookmarks.create({ title: FOLDER_TITLE });
   }
+
+  await chrome.bookmarks.create({
+    parentId: folder.id,
+    title: tab.title,
+    url: tab.url,
+  });
+  chrome.tabs.sendMessage(tab.id, {
+    action: "showBookmarkAlert",
+    title: tab.title,
+  });
+}
+
+function handleTranslate(tab) {
+  const translatedUrl = `https://translate.google.com/translate?sl=auto&tl=ko&u=${encodeURIComponent(tab.url)}`;
+  chrome.tabs.create({ url: translatedUrl, index: tab.index + 1 });
+}
+
+async function handleImageDownload(tab) {
+  const noSpaceTitle = tab.title.replace(/\s+/g, "");
+  const trimmedTitle =
+    noSpaceTitle.length > 15 ? `${noSpaceTitle.slice(0, 15)}...` : noSpaceTitle;
+  const safeTitle = trimmedTitle.replace(/[^\p{L}\p{N}_\-()[\]]/gu, "_");
+
+  const [injectionResult] = await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    func: () =>
+      Array.from(document.querySelectorAll("img"))
+        .map((img) => img.src)
+        .filter((src) => src && !src.startsWith("data:")),
+  });
+
+  const urls = injectionResult?.result;
+  if (!urls || urls.length === 0) {
+    chrome.tabs.sendMessage(tab.id, { action: "noImagesAvailable" });
+    return;
+  }
+
+  urls.forEach((url, index) => {
+    chrome.downloads.download({
+      url,
+      filename: `${safeTitle}/image-${index + 1}.jpg`,
+      saveAs: false,
+    });
+  });
+  chrome.tabs.sendMessage(tab.id, { action: "imagesDownloadSuccess" });
+}
+
+async function handleCaptureTab(tab) {
+  if (isCapturing) return;
+  isCapturing = true;
+
+  try {
+    await chrome.tabs.sendMessage(tab.id, {
+      action: "setToolbarHidden",
+      hidden: true,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, {
+      format: "png",
+    });
+    chrome.tabs.sendMessage(tab.id, {
+      action: "downloadCapturedImage",
+      dataUrl,
+      title: tab.title,
+    });
+  } finally {
+    isCapturing = false;
+    chrome.tabs
+      .sendMessage(tab.id, { action: "setToolbarHidden", hidden: false })
+      .catch(() => {});
+  }
+}
+
+chrome.runtime.onInstalled.addListener(async () => {
+  const { buttonsSetting } = await chrome.storage.local.get("buttonsSetting");
+  chrome.storage.local.set({ buttonsSetting: withDefaultButtons(buttonsSetting) });
+
+  // manifest의 content_scripts는 이미 열려 있던 탭에는 주입되지 않으므로 직접 주입
+  const tabs = await chrome.tabs.query({ url: ["http://*/*", "https://*/*"] });
+  tabs.forEach((tab) => {
+    chrome.scripting
+      .executeScript({ target: { tabId: tab.id }, files: [CONTENT_SCRIPT] })
+      .catch(() => {});
+  });
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -266,7 +167,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  messageHandlers[message.action]?.(message, sender);
+  const tabHandler = tabMessageHandlers[message.action];
+  if (tabHandler && sender.tab) {
+    Promise.resolve(tabHandler(sender.tab, message)).catch((error) =>
+      console.error(`Failed to handle ${message.action}:`, error),
+    );
+  }
 });
 
 // 대시보드 웹(manifest의 externally_connectable에 등록된 origin)만 호출 가능
