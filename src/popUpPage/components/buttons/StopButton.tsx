@@ -3,11 +3,7 @@ import { useTranslation } from "react-i18next";
 export default function StopButton() {
   const { t } = useTranslation();
 
-  const removeToolBarUI = async () => {
-    const tabs = await chrome.tabs.query({});
-    tabs.forEach((tab) => {
-      chrome.tabs.sendMessage(tab.id!, { action: "removeToolbar" });
-    });
+  const removeToolBarUI = () => {
     chrome.storage.local.set({ donuToolActive: false });
   };
 

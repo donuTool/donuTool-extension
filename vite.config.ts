@@ -19,14 +19,6 @@ export default defineConfig(({ mode }) => {
       viteStaticCopy({
         targets: [
           {
-            src: "src/background/*",
-            dest: "background",
-          },
-          {
-            src: "src/overlay/*",
-            dest: "overlay",
-          },
-          {
             src: "src/assets/*",
             dest: "assets",
           },
@@ -49,6 +41,10 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       __GOOGLE_CLIENT_ID__: JSON.stringify(env.GOOGLE_CLIENT_ID),
+      __API_URL__: JSON.stringify(env.API_URL || "http://localhost:3001"),
+      __DASHBOARD_URL__: JSON.stringify(
+        env.DASHBOARD_URL || "http://localhost:5173",
+      ),
     },
   };
 });

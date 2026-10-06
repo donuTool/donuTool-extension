@@ -7,6 +7,7 @@ import { BsPersonCircle } from "react-icons/bs";
 import { useButtonStore } from "@/stores/useButtonStore";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useAddressStore } from "@/stores/useAddressStore";
+import { withDefaultButtons } from "@/shared/defaultButtons";
 import Title from "@/popUpPage/components/Title";
 import LoginButton from "@/popUpPage/components/buttons/LogInButton";
 
@@ -22,11 +23,12 @@ export default function LogInPage() {
     try {
       setIsLoading(true);
       const data = await googleLogin({ prompt: "select_account" });
+      const buttonsSetting = withDefaultButtons(data.user.buttonsSetting);
       chrome.storage?.local.set(
         {
           jwt: data.token,
           user: data.user,
-          buttonsSetting: data.user.buttonsSetting,
+          buttonsSetting,
           isDarkMode: data.user.isDarkMode,
           addressOfNewTab: data.user.addressOfNewTab,
         },
@@ -38,12 +40,12 @@ export default function LogInPage() {
           }
           navigate("/main");
           chrome.tabs.create({
-            url: `http://www.donutool.site?googleId=${data.user.googleId}`,
+            url: __DASHBOARD_URL__,
           });
         },
       );
 
-      setButtons(data.user.buttonsSetting);
+      setButtons(buttonsSetting);
       setIsDarkMode(data.user.isDarkMode);
       setAddress(data.user.addressOfNewTab);
       setIsLoading(false);
@@ -56,7 +58,7 @@ export default function LogInPage() {
   const goToMainPage = () => {
     chrome.storage?.local.set({ user: "guest" }, () => {
       navigate("/main");
-      chrome.tabs.create({ url: "http://www.donutool.site" });
+      chrome.tabs.create({ url: __DASHBOARD_URL__ });
     });
   };
 

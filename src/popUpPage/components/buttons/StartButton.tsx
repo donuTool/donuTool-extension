@@ -3,21 +3,9 @@ import { useTranslation } from "react-i18next";
 export default function StartButton() {
   const { t } = useTranslation();
 
+  // 각 탭의 content script가 storage 변경을 감지해 툴바를 띄운다
   const addToolBarUI = () => {
-    chrome.storage.local.get("donuToolActive", async (data) => {
-      if (!data.donuToolActive) {
-        const tabs = await chrome.tabs.query({});
-        tabs.forEach((tab) => {
-          chrome.scripting.executeScript({
-            target: { tabId: tab.id! },
-            files: ["overlay/injectToolBarUI.js"],
-          });
-          chrome.tabs.sendMessage(tab.id!, { action: "addToolbar" });
-        });
-        chrome.storage.local.set({ donuToolActive: true });
-      }
-      return;
-    });
+    chrome.storage.local.set({ donuToolActive: true });
   };
 
   return (
