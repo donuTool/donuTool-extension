@@ -1,20 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import type { Button } from "@/stores/types";
-import { useThemeStore } from "@/stores/useThemeStore";
 import { useButtonStore } from "@/stores/useButtonStore";
 import { useAddressStore } from "@/stores/useAddressStore";
 import { fetchUser, syncUserSettings } from "@/popUpPage/utils/userApi";
+import { normalizeAddress } from "@/shared/settings";
 import GoBackButton from "@/popUpPage/components/buttons/GoBackButton";
 import VirtualToolBar from "@/popUpPage/components/VirtualToolBar";
 import ButtonsInList from "@/popUpPage/components/ButtonsInList";
 
 export default function SettingPage() {
   const { t } = useTranslation();
-  const isDarkMode = useThemeStore((state) => state.isDarkMode);
   const { buttons, setButtons } = useButtonStore();
   const { address, setAddress } = useAddressStore();
+  const [hasAddressError, setHasAddressError] = useState(false);
+  const addressErrorTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(addressErrorTimer.current), []);
 
   // 마운트 시에는 불러오기만 하고, 저장(storage + 서버)은 사용자가 변경했을 때만 한다
   useEffect(() => {
@@ -62,43 +65,18 @@ export default function SettingPage() {
   };
 
   const setAddressOfNewTab = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      let addressValue = event.currentTarget.value;
-      const inputElement = event.currentTarget;
+    if (event.key !== "Enter") return;
 
-      const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(addressValue);
-      const hasPeriod = /\./.test(addressValue);
-      const hasBlankSpace = /\s/.test(addressValue);
-
-      if (hasKorean || !hasPeriod || hasBlankSpace) {
-        if (isDarkMode) {
-          inputElement.classList.remove("dark:bg-donutool-button");
-          inputElement.classList.add("bg-red-400", "animate-shake");
-        } else {
-          inputElement.classList.remove("bg-neutral-100");
-          inputElement.classList.add("bg-red-100", "animate-shake");
-        }
-
-        setTimeout(() => {
-          inputElement.classList.remove("animate-shake");
-        }, 400);
-        setTimeout(() => {
-          if (isDarkMode) {
-            inputElement.classList.remove("bg-red-400");
-            inputElement.classList.add("dark:bg-donutool-button");
-          } else {
-            inputElement.classList.remove("bg-red-100");
-            inputElement.classList.add("bg-neutral-100");
-          }
-        }, 1000);
-        return;
-      }
-
-      if (!/^https?:\/\//.test(addressValue)) {
-        addressValue = "https://" + addressValue;
-      }
-      saveAddress(addressValue);
+    const normalized = normalizeAddress(event.currentTarget.value);
+    if (!normalized) {
+      clearTimeout(addressErrorTimer.current);
+      setHasAddressError(true);
+      addressErrorTimer.current = setTimeout(() => setHasAddressError(false), 1000);
+      return;
     }
+
+    setHasAddressError(false);
+    saveAddress(normalized);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -142,7 +120,12 @@ export default function SettingPage() {
         </div>
       </DndContext>
       <input
-        className="dark:bg-donutool-button dark:text-donutool-text my-2 h-7 w-45 rounded-lg bg-neutral-100 text-center transition-all duration-300 placeholder:text-center focus:outline-none"
+        className={`dark:text-donutool-text my-2 h-7 w-45 rounded-lg text-center transition-all duration-300 placeholder:text-center focus:outline-none ${
+          hasAddressError
+            ? "animate-shake bg-red-100 dark:bg-red-400"
+            : "dark:bg-donutool-button bg-neutral-100"
+        }`}
+        aria-invalid={hasAddressError}
         placeholder={t("typeAddress")}
         onKeyDown={setAddressOfNewTab}
       />
