@@ -24,13 +24,22 @@ export default function LogInPage() {
       setIsLoading(true);
       const data = await googleLogin({ prompt: "select_account" });
       const buttonsSetting = withDefaultButtons(data.user.buttonsSetting);
+      const isDarkMode =
+        typeof data.user.isDarkMode === "boolean"
+          ? data.user.isDarkMode
+          : useThemeStore.getState().isDarkMode;
+      const addressOfNewTab =
+        data.user.addressOfNewTab || useAddressStore.getState().address;
       chrome.storage?.local.set(
         {
           jwt: data.token,
           user: data.user,
           buttonsSetting,
-          isDarkMode: data.user.isDarkMode,
-          addressOfNewTab: data.user.addressOfNewTab,
+          isDarkMode,
+          addressOfNewTab,
+          // 서버에 쌓인 횟수를 이어받는다 (게스트 기록은 첫 가입 때 서버로 올라감)
+          buttonClickCounts: data.user.buttonClickCounts ?? {},
+          pendingClicks: {},
         },
         () => {
           if (chrome.runtime.lastError) {
@@ -46,8 +55,8 @@ export default function LogInPage() {
       );
 
       setButtons(buttonsSetting);
-      setIsDarkMode(data.user.isDarkMode);
-      setAddress(data.user.addressOfNewTab);
+      setIsDarkMode(isDarkMode);
+      setAddress(addressOfNewTab);
       setIsLoading(false);
     } catch (e) {
       alert(`Error: 로그인 실패 ${e}`);

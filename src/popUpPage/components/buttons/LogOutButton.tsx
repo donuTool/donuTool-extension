@@ -8,6 +8,7 @@ export default function LogOutButton() {
     chrome.storage?.local.remove(
       [
         "buttonClickCounts",
+        "pendingClicks",
         "buttonsSetting",
         "isDarkMode",
         "addressOfNewTab",

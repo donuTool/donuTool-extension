@@ -10,7 +10,6 @@ import {
 } from "./cursorUtils.js";
 
 const TEARDOWN_EVENT = "donutool:teardown";
-const TOOLBAR_BUTTON_COUNT = 5;
 
 // 확장프로그램 재설치/업데이트로 다시 주입되면 이전 인스턴스를 정리하고 새로 시작한다
 document.dispatchEvent(new CustomEvent(TEARDOWN_EVENT));
@@ -24,22 +23,16 @@ function init() {
 
   function handleButtonClick(actionKey) {
     buttonActions[actionKey]?.(ui);
-
-    chrome.storage.local.get("buttonClickCounts", ({ buttonClickCounts }) => {
-      const counts = { ...buttonClickCounts };
-      counts[actionKey] = (counts[actionKey] || 0) + 1;
-      chrome.storage.local.set({ buttonClickCounts: counts });
-      chrome.runtime.sendMessage({
-        action: "syncUserSettings",
-        settings: { buttonClickCounts: counts },
-      });
-    });
+    // 횟수 집계와 서버 전송은 background에서 한 곳으로 모아 처리한다
+    chrome.runtime.sendMessage({ action: "recordClick", id: actionKey });
   }
 
   async function renderButtons() {
     const { buttonsSetting } = await chrome.storage.local.get("buttonsSetting");
     ui.renderButtons(
-      withDefaultButtons(buttonsSetting).slice(0, TOOLBAR_BUTTON_COUNT),
+      withDefaultButtons(buttonsSetting).filter(
+        (button) => button.status === "IN_TOOLBAR",
+      ),
     );
   }
 

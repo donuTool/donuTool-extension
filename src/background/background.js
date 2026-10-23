@@ -1,8 +1,12 @@
-import { withDefaultButtons } from "@/shared/defaultButtons";
+import { DEFAULT_BUTTONS, withDefaultButtons } from "@/shared/defaultButtons";
 import { t, uiLanguage } from "@/shared/messages";
+import { addCounts, hasCounts, splitForUpload } from "@/shared/clickCounts";
+import { pickSyncedSettings, sanitizeSettings } from "@/shared/settings";
 
 const API_URL = __API_URL__;
 const CONTENT_SCRIPT = "content/content.js";
+const CLICK_FLUSH_DELAY = 3000;
+const BUTTON_IDS = new Set(DEFAULT_BUTTONS.map((button) => button.id));
 
 let isCapturing = false;
 
@@ -16,6 +20,7 @@ const tabMessageHandlers = {
   openTranslatedPage: handleTranslate,
   downloadImages: handleImageDownload,
   captureVisibleTab: handleCaptureTab,
+  recordClick: (tab, message) => recordClick(message.id),
 };
 
 const asyncMessageHandlers = {
@@ -46,6 +51,144 @@ async function apiRequest(path, { method = "GET", body } = {}) {
   }
 
   return res.json();
+}
+
+// storage를 읽고-수정하고-쓰는 작업이 서로 끼어들지 않도록 순서대로 실행한다
+let storageQueue = Promise.resolve();
+function withStorageLock(task) {
+  const run = storageQueue.then(task);
+  storageQueue = run.catch(() => {});
+  return run;
+}
+
+// 클릭 횟수는 로컬에 바로 더하고, 로그인 상태면 pendingClicks에 모아 두었다가
+// 몇 초마다 서버에 증가분만 보낸다 (전체 값을 덮어쓰면 다른 기기의 기록이 사라짐)
+async function recordClick(id) {
+  if (!BUTTON_IDS.has(id)) return;
+
+  const isLoggedIn = await withStorageLock(async () => {
+    const { buttonClickCounts, pendingClicks, jwt } =
+      await chrome.storage.local.get(["buttonClickCounts", "pendingClicks", "jwt"]);
+    const update = { buttonClickCounts: addCounts(buttonClickCounts, { [id]: 1 }) };
+    if (jwt) update.pendingClicks = addCounts(pendingClicks, { [id]: 1 });
+    await chrome.storage.local.set(update);
+    return Boolean(jwt);
+  });
+
+  if (isLoggedIn) scheduleClickFlush();
+}
+
+let clickFlushTimer = null;
+function scheduleClickFlush() {
+  if (clickFlushTimer) return;
+  clickFlushTimer = setTimeout(() => {
+    clickFlushTimer = null;
+    flushClicks().catch((error) => console.error("Failed to flush clicks:", error));
+  }, CLICK_FLUSH_DELAY);
+}
+
+async function flushClicks() {
+  const toSend = await withStorageLock(async () => {
+    const { pendingClicks } = await chrome.storage.local.get("pendingClicks");
+    const { toSend, remaining } = splitForUpload(pendingClicks);
+    await chrome.storage.local.set({ pendingClicks: remaining });
+    return toSend;
+  });
+  if (!hasCounts(toSend)) return;
+
+  let data;
+  try {
+    data = await apiRequest("/api/user/me/clicks", {
+      method: "POST",
+      body: { counts: toSend },
+    });
+  } catch (error) {
+    // 네트워크 오류 등: 다음에 다시 보낸다
+    await withStorageLock(async () => {
+      const { pendingClicks } = await chrome.storage.local.get("pendingClicks");
+      await chrome.storage.local.set({ pendingClicks: addCounts(pendingClicks, toSend) });
+    });
+    throw error;
+  }
+
+  // 서버 값 + 아직 보내지 않은 클릭 = 이 기기에서 보여줄 값
+  await withStorageLock(async () => {
+    const { pendingClicks } = await chrome.storage.local.get("pendingClicks");
+    if (data?.buttonClickCounts) {
+      await chrome.storage.local.set({
+        buttonClickCounts: addCounts(data.buttonClickCounts, pendingClicks),
+      });
+    }
+    if (hasCounts(pendingClicks ?? {})) scheduleClickFlush();
+  });
+}
+
+// 서버에 저장된 설정을 이 기기의 storage로 가져온다 (다른 기기나 대시보드에서 바꾼 값 반영)
+async function syncFromServer() {
+  const user = await apiRequest("/api/user/me");
+  if (!user) return null;
+
+  await withStorageLock(async () => {
+    const { pendingClicks } = await chrome.storage.local.get("pendingClicks");
+    const update = {
+      user,
+      buttonsSetting: withDefaultButtons(user.buttonsSetting),
+      buttonClickCounts: addCounts(user.buttonClickCounts, pendingClicks),
+    };
+    if (typeof user.isDarkMode === "boolean") update.isDarkMode = user.isDarkMode;
+    if (user.addressOfNewTab) update.addressOfNewTab = user.addressOfNewTab;
+    await chrome.storage.local.set(update);
+    if (hasCounts(pendingClicks ?? {})) scheduleClickFlush();
+  });
+
+  return user;
+}
+
+async function getState() {
+  const user = await syncFromServer().catch((error) => {
+    console.error("Failed to sync from server:", error);
+    return null;
+  });
+  const state = await chrome.storage.local.get([
+    "jwt",
+    "donuToolActive",
+    "buttonsSetting",
+    "isDarkMode",
+    "addressOfNewTab",
+    "buttonClickCounts",
+  ]);
+
+  return {
+    version: chrome.runtime.getManifest().version,
+    isLoggedIn: Boolean(state.jwt),
+    createdAt: user?.createdAt ?? null,
+    donuToolActive: Boolean(state.donuToolActive),
+    buttonsSetting: withDefaultButtons(state.buttonsSetting),
+    isDarkMode: typeof state.isDarkMode === "boolean" ? state.isDarkMode : null,
+    addressOfNewTab: state.addressOfNewTab ?? null,
+    buttonClickCounts: state.buttonClickCounts ?? {},
+  };
+}
+
+async function updateSettings(message) {
+  const settings = sanitizeSettings(message.settings);
+  if (Object.keys(settings).length === 0) throw new Error("No valid settings");
+
+  await chrome.storage.local.set(settings);
+
+  const synced = pickSyncedSettings(settings);
+  if (Object.keys(synced).length > 0) {
+    await apiRequest("/api/user/me", { method: "PUT", body: synced });
+  }
+  return getState();
+}
+
+async function resetStats() {
+  await withStorageLock(() =>
+    chrome.storage.local.set({ buttonClickCounts: {}, pendingClicks: {} }),
+  );
+  await apiRequest("/api/user/me/stats", { method: "DELETE" });
+  return getState();
 }
 
 async function switchTab(currentTab, step) {
@@ -143,6 +286,17 @@ async function handleCaptureTab(tab) {
   }
 }
 
+// 브라우저를 켤 때 못 보낸 클릭을 보내고 서버 설정을 가져온다
+chrome.runtime.onStartup.addListener(() => {
+  flushClicks()
+    .catch((error) => console.error("Failed to flush clicks:", error))
+    .finally(() =>
+      syncFromServer().catch((error) =>
+        console.error("Failed to sync from server:", error),
+      ),
+    );
+});
+
 chrome.runtime.onInstalled.addListener(async () => {
   const { buttonsSetting } = await chrome.storage.local.get("buttonsSetting");
   chrome.storage.local.set({ buttonsSetting: withDefaultButtons(buttonsSetting) });
@@ -174,11 +328,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // 대시보드 웹(manifest의 externally_connectable에 등록된 origin)만 호출 가능
+const externalHandlers = {
+  getSession: async () => {
+    const { jwt } = await chrome.storage.local.get("jwt");
+    return { token: jwt ?? null };
+  },
+  getState: async () => ({ data: await getState() }),
+  updateSettings: async (message) => ({ data: await updateSettings(message) }),
+  resetStats: async () => ({ data: await resetStats() }),
+};
+
 chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
-  if (message?.action === "getSession") {
-    chrome.storage.local.get("jwt", ({ jwt }) => {
-      sendResponse({ token: jwt ?? null });
-    });
-    return true;
+  const action = message?.action;
+  if (typeof action !== "string" || !Object.hasOwn(externalHandlers, action)) {
+    return;
   }
+
+  externalHandlers[action](message)
+    .then(sendResponse)
+    .catch((error) => sendResponse({ error: error.message }));
+  return true;
 });
